@@ -1,0 +1,115 @@
+{
+  "kind": "collectionType",
+  "collectionName": "libros",
+  "info": {
+    "singularName": "libro",
+    "pluralName": "libros",
+    "displayName": "Libro"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true
+    },
+    "autor": {
+      "type": "string",
+      "required": true
+    },
+    "sinopsis": {
+      "type": "richtext",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "titulo",
+      "required": true
+    },
+    "portada": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "isbn": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "precio": {
+      "type": "decimal",
+      "required": true
+    },
+    "fecha_publicacion": {
+      "type": "date"
+    },
+    "paginas": {
+      "type": "integer"
+    },
+    "editorial": {
+      "type": "string"
+    },
+    "idioma": {
+      "type": "enumeration",
+      "enum": [
+        "Español",
+        "Inglés",
+        "Francés",
+        "Alemán",
+        "Italiano"
+      ]
+    },
+    "tradicion": {
+      "type": "enumeration",
+      "enum": [
+        "Tarot y Adivinación",
+        "Astrología",
+        "Brujería y Wicca",
+        "Alquimia",
+        "Hermetismo",
+        "Cábala",
+        "Magia Ceremonial",
+        "Ocultismo Histórico",
+        "Cristales y Gemas",
+        "Chamanismo"
+      ]
+    },
+    "nivel": {
+      "type": "enumeration",
+      "enum": [
+        "Principiante",
+        "Intermedio",
+        "Avanzado"
+      ]
+    },
+    "tipo_contenido": {
+      "type": "enumeration",
+      "enum": [
+        "Teórico",
+        "Práctico",
+        "Grimorio",
+        "Historia",
+        "Guía Ilustrada"
+      ]
+    },
+    "valoracion": {
+      "type": "decimal",
+      "min": 0,
+      "max": 5
+    },
+    "stock": {
+      "type": "integer",
+      "min": 0
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false
+    }
+  }
+}
