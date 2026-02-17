@@ -1,71 +1,38 @@
 ---
+import Layout from '../layouts/Layout.astro';
+
 const response = await fetch('http://18.203.68.217:1337/api/libros');
 const data = await response.json();
 const libros = data.data;
 ---
 
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca Arcana - Catálogo Esotérico</title>
-</head>
-<body class="bg-gray-900 text-gray-100 min-h-screen">
-  
-  <!-- Header -->
-  <header class="bg-purple-900 py-8 mb-12">
-    <div class="container mx-auto px-4">
-      <h1 class="text-4xl md:text-5xl font-bold text-center text-purple-200">
-        🔮 Biblioteca Arcana
-      </h1>
-      <p class="text-center text-purple-300 mt-2">Sabiduría ancestral y conocimiento oculto</p>
-    </div>
-  </header>
+<Layout>
+  <div class="container mx-auto px-4 py-12">
+    <h2 class="text-4xl font-bold text-purple-300 text-center mb-12">
+      📚 Catálogo Esotérico
+    </h2>
 
-  <!-- Grid de libros -->
-  <div class="container mx-auto px-4 pb-12">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      
       {libros.map(libro => (
-        <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-purple-500/50 transition-all duration-300 border border-purple-900/30">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-purple-900/30 hover:border-purple-500 transition-all duration-300">
+          <h3 class="text-xl font-bold text-purple-300 mb-2">{libro.titulo}</h3>
+          <p class="text-gray-400 text-sm mb-4">por {libro.autor}</p>
+          <p class="text-gray-300 text-sm mb-4">{libro.sinopsis}</p>
           
-          <!-- Contenido del libro -->
-          <div class="p-6">
-            <h2 class="text-2xl font-bold text-purple-300 mb-2">{libro.titulo}</h2>
-            <p class="text-gray-400 text-sm mb-4">por {libro.autor}</p>
-            
-            <p class="text-gray-300 text-sm mb-4 line-clamp-3">{libro.sinopsis}</p>
-            
-            <div class="space-y-2 text-sm">
-              <div class="flex items-center gap-2">
-                <span class="text-purple-400">✨ Tradición:</span>
-                <span class="text-gray-300">{libro.tradicion}</span>
-              </div>
-              
-              <div class="flex items-center gap-2">
-                <span class="text-purple-400">📖 Nivel:</span>
-                <span class="text-gray-300">{libro.nivel}</span>
-              </div>
-              
-              <div class="flex items-center gap-2">
-                <span class="text-purple-400">⭐ Valoración:</span>
-                <span class="text-yellow-400">{libro.valoracion}/5</span>
-              </div>
-            </div>
-            
-            <div class="mt-6 flex items-center justify-between">
-              <span class="text-2xl font-bold text-purple-400">{libro.precio}€</span>
-              <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
-                Ver detalles
-              </button>
-            </div>
+          <div class="space-y-1 text-sm mb-4">
+            <p><span class="text-purple-400">✨ Tradición:</span> {libro.tradicion}</p>
+            <p><span class="text-purple-400">📖 Nivel:</span> {libro.nivel}</p>
+            <p><span class="text-purple-400">⭐ Valoración:</span> {libro.valoracion}/5</p>
           </div>
-          
+
+          <div class="flex justify-between items-center">
+            <span class="text-2xl font-bold text-purple-400">{libro.precio}€</span>
+            <a href={`/libros/${libro.slug}`} class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+              Ver detalles
+            </a>
+          </div>
         </div>
       ))}
-      
     </div>
   </div>
-
-</body>
-</html>
+</Layout>

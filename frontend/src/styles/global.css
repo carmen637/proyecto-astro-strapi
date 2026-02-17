@@ -1,1 +1,68 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #7C3AED;
+  --color-secondary: #4C1D95;
+  --color-background: #111827;
+  --color-surface: #1F2937;
+  --color-text: #F3F4F6;
+  --color-text-muted: #9CA3AF;
+  --color-accent: #FACC15;
+  --font-primary: 'Georgia', serif;
+  --border-radius: 8px;
+
+  --font-xl: clamp(2.5rem, 5vw, 4rem);
+  --font-l: clamp(2rem, 4vw, 3rem);
+  --font-m: clamp(1.5rem, 3vw, 2rem);
+  --font-s: clamp(1rem, 2vw, 1.25rem);
+  --font-xs: clamp(0.875rem, 1.5vw, 1rem);
+
+  --spacing-xl: clamp(3rem, 6vw, 6rem);
+  --spacing-l: clamp(2rem, 4vw, 4rem); 
+  --spacing-m: clamp(1rem, 2vw, 2rem);
+  --spacing-s: clamp(0.5rem, 1vw, 1rem);
+
+  --fuentePrimaria: font-serif;
+}
+
+h1{
+    font-size: var(--font-xl);
+    font-family: var(--fuentePrimaria);
+}
+
+h2{
+    font-size: var(--font-l);
+    text-align: center;
+    font-family: var(--fuentePrimaria);
+}
+
+h3{
+    font-size: var(--font-m);
+}
+p{
+    font-size: var(--font-s);
+}
+span{
+    color: #FACC15;
+}
+@layer components {
+  .btn {
+    @apply inline-block rounded-lg transition-all duration-300;
+    padding: var(--spacing-s) var(--spacing-m);
+    font-size: var(--font-s);
+  }
+
+  .btn-primary {
+    @apply bg-purple-600 hover:bg-purple-700 text-white;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-700 hover:bg-gray-600 text-white;
+  }
+
+  .btn-outline {
+    @apply border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black;
+  }
+}

@@ -1,0 +1,11 @@
+---
+const response = await fetch('http://18.203.68.217:1337/api/global');
+const data = await response.json();
+const global = data.data;
+---
+
+<footer class="bg-purple-900 py-6 mt-12">
+  <div class="container mx-auto text-center">
+    <p class="text-purple-300">{global.footer_texto}</p>
+  </div>
+</footer>

@@ -1,17 +1,140 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
 
+const responseDestacados = await fetch('http://18.203.68.217:1337/api/libros?filters[destacado][$eq]=true&populate=*');
+const dataDestacados = await responseDestacados.json();
+const librosDestacados = dataDestacados.data;
+
+// Obtener todas las tradiciones únicas
+const responseTodos = await fetch('http://18.203.68.217:1337/api/libros?populate=portada');
+const dataTodos = await responseTodos.json();
+const todosLibros = dataTodos.data;
+
+const tradicionesUnicas = [...new Set(todosLibros.map(libro => libro.tradicion))];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+
+<section class="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0B0F2A] via-[#0f172a] to-[#050814]">
+
+  <!-- Canvas estrellas -->
+  <canvas id="stars" class="absolute inset-0 w-full h-full"></canvas>
+
+  <!-- Overlay oscuro -->
+  <div class="absolute inset-0 bg-black/40"></div>
+
+  <!-- Contenido -->
+  <div class="relative z-10 text-center text-white px-6">
+    <h1 class="">
+      Biblioteca <span class="text-[#FACC15]">Arcana</span>
+    </h1>
+    <p class="mx-auto">
+      Sabiduría antigua para almas modernas
+    </p>
+    
+	<Button type="outline" href="/libros" class="btn-outline mt-6" >
+  		Explorar colección
+	</Button>
+  </div>
+
+</section>
+
+
+<!-- NOVEDADES -->
+<section class="py-24 bg-gradient-to-b from-[#0B0F2A] to-[#050814]">
+  <div class="max-w-6xl mx-auto px-6">
+    <h2 class="text-4xl font-serif text-center mb-4 text-white">
+      Nuevos en <span class="text-[#FACC15]">Arcana</span>
+    </h2>
+    <p class="text-gray-400 text-center mb-16">
+      Descubre las últimas incorporaciones a nuestra colección
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {todosLibros.slice(0, 3).map(libro => (
+        <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition-all duration-300">
+          <div class="p-6">
+		  <img src={`http://18.203.68.217:1337${libro.portada?.url}`} alt={libro.titulo}class="w-full h-48 object-cover"/>
+            <h3 class="text-xl font-bold text-white mb-2">{libro.titulo}</h3>
+            <p class="text-gray-400 text-sm mb-3">por {libro.autor}</p>
+            <p class="text-gray-300 text-sm mb-4 line-clamp-3">{libro.sinopsis}</p>
+            
+            <div class="flex justify-between items-center mt-6">
+              <span class="text-[#FACC15] font-bold text-xl">{libro.precio}€</span>
+              <Button type="outline" href={`/libros/${libro.slug}`} class="text-sm">
+                Ver más
+              </Button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+	<section class="py-24 bg-[#0B0F2A] text-white">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-serif mb-4">Tradiciones Esotéricas</h2>
+    <p class="text-gray-400 mb-16">
+      Explora los diferentes caminos del conocimiento místico
+    </p>
+
+    <div class="grid gap-6" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+  {tradicionesUnicas.map(tradicion => (
+    <a href={`/libros?tradicion=${encodeURIComponent(tradicion)}`}>
+      <div class="bg-[#111827] p-8 rounded-xl border border-white/10 hover:border-[#D4AF37] transition duration-300 cursor-pointer">
+        <h3 class="text-xl font-semibold text-white">{tradicion}</h3>
+      </div>
+    </a>
+  ))}
+</div>
+</section>
+
+
+
+
+<script>
+  const canvas = document.getElementById("stars");
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  resize();
+  window.addEventListener("resize", resize);
+
+  let stars = [];
+
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 1.5,
+      alpha: Math.random(),
+      speed: Math.random() * 0.2
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    stars.forEach(star => {
+      star.y += star.speed;
+      if (star.y > canvas.height) star.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>
+</Layout>
