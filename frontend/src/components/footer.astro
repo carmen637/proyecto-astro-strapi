@@ -1,11 +1,17 @@
 ---
-const response = await fetch('http://18.201.196.247:1337/api/global');
-const data = await response.json();
-const global = data.data;
+// Sin fetch en el servidor
 ---
 
 <footer class="bg-purple-900 py-6 mt-12">
   <div class="container mx-auto text-center">
-    <p class="text-purple-300">{global.footer_texto}</p>
+    <p class="text-purple-300" id="footer-text">© 2026 Biblioteca Arcana</p>
   </div>
 </footer>
+
+<script>
+  fetch('http://18.201.196.247:1337/api/global')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('footer-text').textContent = data.data.footer_texto;
+    });
+</script>

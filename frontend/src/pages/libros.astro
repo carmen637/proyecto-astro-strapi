@@ -1,9 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-const response = await fetch('http://18.201.196.247:1337/api/libros');
-const data = await response.json();
-const libros = data.data;
 ---
 
 <Layout>
@@ -12,27 +8,39 @@ const libros = data.data;
       📚 Catálogo Esotérico
     </h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {libros.map(libro => (
+    <div id="libros-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Se llenarán con JavaScript -->
+    </div>
+  </div>
+</Layout>
+
+<script>
+  fetch('http://18.201.196.247:1337/api/libros?populate=portada')
+    .then(res => res.json())
+    .then(data => {
+      const libros = data.data;
+      const grid = document.getElementById('libros-grid');
+      
+      grid.innerHTML = libros.map(libro => `
         <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-purple-900/30 hover:border-purple-500 transition-all duration-300">
-          <h3 class="text-xl font-bold text-purple-300 mb-2">{libro.titulo}</h3>
-          <p class="text-gray-400 text-sm mb-4">por {libro.autor}</p>
-          <p class="text-gray-300 text-sm mb-4">{libro.sinopsis}</p>
+          ${libro.portada?.url ? `<img src="http://18.201.196.247:1337${libro.portada.url}" alt="${libro.titulo}" class="w-full h-48 object-cover rounded mb-4">` : ''}
+          <h3 class="text-xl font-bold text-purple-300 mb-2">${libro.titulo}</h3>
+          <p class="text-gray-400 text-sm mb-4">por ${libro.autor}</p>
+          <p class="text-gray-300 text-sm mb-4">${libro.sinopsis}</p>
           
           <div class="space-y-1 text-sm mb-4">
-            <p><span class="text-purple-400">✨ Tradición:</span> {libro.tradicion}</p>
-            <p><span class="text-purple-400">📖 Nivel:</span> {libro.nivel}</p>
-            <p><span class="text-purple-400">⭐ Valoración:</span> {libro.valoracion}/5</p>
+            <p><span class="text-purple-400">✨ Tradición:</span> ${libro.tradicion}</p>
+            <p><span class="text-purple-400">📖 Nivel:</span> ${libro.nivel}</p>
+            <p><span class="text-purple-400">⭐ Valoración:</span> ${libro.valoracion}/5</p>
           </div>
 
           <div class="flex justify-between items-center">
-            <span class="text-2xl font-bold text-purple-400">{libro.precio}€</span>
-            <a href={`/libros/${libro.slug}`} class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+            <span class="text-2xl font-bold text-purple-400">${libro.precio}€</span>
+            <a href="/libros/${libro.slug}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
               Ver detalles
             </a>
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-</Layout>
+      `).join('');
+    });
+</script>

@@ -1,33 +1,32 @@
 ---
-const response = await fetch('http://18.201.196.247:1337/api/global?populate=nav_enlaces');
-const data = await response.json();
-const global = data.data;
+// Sin fetch en el servidor
 ---
 
 <header class="sticky top-0 z-50 bg-[#0B0F2A] border-b border-white/10">
   <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-
-    <!-- Logo / Nombre del sitio -->
-    <h1 class="text-xl md:text-2xl font-serif tracking-wider text-white">
-      {global.nombre_sitio}
+    <h1 class="text-xl md:text-2xl font-serif tracking-wider text-white" id="site-name">
+      Biblioteca Arcana
     </h1>
 
-    <!-- Navegación -->
-    <nav class="hidden md:flex gap-10 text-sm tracking-wide">
-      {global.nav_enlaces.map(enlace => (
-        <a 
-          href={enlace.url} 
-          class="relative group text-white transition duration-300"
-        >
-          <span class="group-hover:text-[#D4AF37] transition duration-300">
-            {enlace.texto}
-          </span>
-
-          <!-- Línea dorada animada -->
-          <span class="absolute left-0 -bottom-1 w-0 h-[1px] bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
-        </a>
-      ))}
+    <nav class="hidden md:flex gap-10 text-sm tracking-wide" id="nav-links">
+      <!-- Se llenarán con JavaScript -->
     </nav>
-
   </div>
 </header>
+
+<script>
+  fetch('http://18.201.196.247:1337/api/global?populate=nav_enlaces')
+    .then(res => res.json())
+    .then(data => {
+      const global = data.data;
+      document.getElementById('site-name').textContent = global.nombre_sitio;
+      
+      const nav = document.getElementById('nav-links');
+      nav.innerHTML = global.nav_enlaces.map(enlace => `
+        <a href="${enlace.url}" class="relative group text-white transition duration-300">
+          <span class="group-hover:text-[#D4AF37] transition duration-300">${enlace.texto}</span>
+          <span class="absolute left-0 -bottom-1 w-0 h-[1px] bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      `).join('');
+    });
+</script>
