@@ -2,11 +2,75 @@
 // Sin fetch en el servidor
 ---
 
-<footer class="bg-purple-900 py-6 mt-12">
-  <div class="container mx-auto text-center">
-    <p class="text-purple-300" id="footer-text">© 2026 Biblioteca Arcana</p>
+
+<footer class="bg-[#0B0F2A] border-t border-white/10 text-white mt-12">
+  <div class="max-w-6xl mx-auto px-6 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+
+      <!-- Columna 1: Marca -->
+      <div>
+        <h3 class="text-xl font-serif text-[#FACC15] mb-4">Biblioteca Arcana</h3>
+        <p class="text-gray-400 text-sm leading-relaxed" id="footer-text">
+          Sabiduría antigua para almas modernas.
+        </p>
+      </div>
+
+      <!-- Columna 2: Navegación -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">Explorar</h3>
+        <ul class="space-y-2">
+          <li><a href="/" class="text-gray-300 hover:text-[#FACC15] transition text-sm">Inicio</a></li>
+          <li><a href="/libros" class="text-gray-300 hover:text-[#FACC15] transition text-sm">Catálogo</a></li>
+          <li><a href="/blog" class="text-gray-300 hover:text-[#FACC15] transition text-sm">Blog</a></li>
+          <li><a href="/contacto" class="text-gray-300 hover:text-[#FACC15] transition text-sm">Contacto</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Tradiciones -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">Tradiciones</h3>
+        <ul class="space-y-2" id="footer-tradiciones">
+          <li class="text-gray-500 text-sm">Cargando...</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Copyright -->
+  <div class="border-t border-white/10 py-6 text-center">
+    <p class="text-gray-500 text-sm">© 2026 Biblioteca Arcana. Todos los derechos reservados.</p>
   </div>
 </footer>
+
+<script>
+  // Footer texto
+  fetch('http://18.201.196.247:1337/api/global')
+    .then(res => res.json())
+    .then(data => {
+      const el = document.getElementById('footer-text');
+      if (el && data.data?.footer_texto) {
+        el.textContent = data.data.footer_texto;
+      }
+    });
+
+  // Tradiciones
+  fetch('http://18.201.196.247:1337/api/tradicions')
+    .then(res => res.json())
+    .then(data => {
+      const lista = document.getElementById('footer-tradiciones');
+      if (lista && data.data?.length) {
+        lista.innerHTML = data.data.map(t => `
+          <li>
+            <a href="/libros?tradicion=${encodeURIComponent(t.nombre)}" 
+               class="text-gray-300 hover:text-[#FACC15] transition text-sm">
+              ${t.nombre}
+            </a>
+          </li>
+        `).join('');
+      }
+    });
+</script>
 
 <script>
   fetch('http://18.201.196.247:1337/api/global')

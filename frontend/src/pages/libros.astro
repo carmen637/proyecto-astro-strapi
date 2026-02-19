@@ -3,44 +3,77 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-  <div class="container mx-auto px-4 py-12">
-    <h2 class="text-4xl font-bold text-purple-300 text-center mb-12">
-      📚 Catálogo Esotérico
-    </h2>
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
+    <div class="max-w-6xl mx-auto px-6">
 
-    <div id="libros-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <!-- Se llenarán con JavaScript -->
+      <!-- Cabecera -->
+      <h1 class="text-center mb-4 text-white">
+        Catálogo <span class="text-[#FACC15]">Esotérico</span>
+      </h1>
+      <p class="text-gray-400 text-center mb-16">
+        Explora nuestra colección de sabiduría ancestral
+      </p>
+
+      <!-- Loading state -->
+      <div id="loading" class="text-center text-gray-400 py-20">
+        <p class="text-xl">Invocando los libros...</p>
+      </div>
+
+      <!-- Grid -->
+      <div id="libros-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
+      </div>
+
+      <!-- Error state -->
+      <div id="error" class="text-center text-red-400 py-20 hidden">
+        <p>Error al cargar los libros. Inténtalo de nuevo.</p>
+      </div>
+
     </div>
-  </div>
+  </section>
 </Layout>
 
+
 <script>
+  const grid = document.getElementById('libros-grid');
+  const loading = document.getElementById('loading');
+  const error = document.getElementById('error');
+
   fetch('http://18.201.196.247:1337/api/libros?populate=portada')
     .then(res => res.json())
     .then(data => {
       const libros = data.data;
-      const grid = document.getElementById('libros-grid');
-      
-      grid.innerHTML = libros.map(libro => `
-        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-purple-900/30 hover:border-purple-500 transition-all duration-300">
-          ${libro.portada?.url ? `<img src="http://18.201.196.247:1337${libro.portada.url}" alt="${libro.titulo}" class="w-full h-48 object-cover rounded mb-4">` : ''}
-          <h3 class="text-xl font-bold text-purple-300 mb-2">${libro.titulo}</h3>
-          <p class="text-gray-400 text-sm mb-4">por ${libro.autor}</p>
-          <p class="text-gray-300 text-sm mb-4">${libro.sinopsis}</p>
-          
-          <div class="space-y-1 text-sm mb-4">
-            <p><span class="text-purple-400">✨ Tradición:</span> ${libro.tradicion}</p>
-            <p><span class="text-purple-400">📖 Nivel:</span> ${libro.nivel}</p>
-            <p><span class="text-purple-400">⭐ Valoración:</span> ${libro.valoracion}/5</p>
-          </div>
+      loading.classList.add('hidden');
 
-          <div class="flex justify-between items-center">
-            <span class="text-2xl font-bold text-purple-400">${libro.precio}€</span>
-            <a href="/libros/${libro.slug}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
-              Ver detalles
-            </a>
+      grid.innerHTML = libros.map(libro => `
+        <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition-all duration-300 flex flex-col">
+          ${libro.portada?.url 
+            ? `<img src="http://18.201.196.247:1337${libro.portada.url}" alt="${libro.titulo}" class="w-full h-48 object-cover"/>` 
+            : `<div class="w-full h-48 bg-[#0B0F2A] flex items-center justify-center text-4xl">✦</div>`
+          }
+          <div class="p-6 flex flex-col flex-1">
+            <h3 class="text-xl font-bold text-white mb-1">${libro.titulo}</h3>
+            <p class="text-gray-400 text-sm mb-3">por ${libro.autor}</p>
+            <p class="text-gray-300 text-sm mb-4 line-clamp-3">${libro.sinopsis}</p>
+
+            <div class="space-y-1 text-sm mb-6 mt-auto">
+              <p><span class="text-[#FACC15]">✦ Nivel:</span> <span class="text-gray-300">${libro.nivel}</span></p>
+              <p><span class="text-[#FACC15]">⭐ Valoración:</span> <span class="text-gray-300">${libro.valoracion}/5</span></p>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-[#FACC15] font-bold text-xl">${libro.precio}€</span>
+              <a href="/libros/${libro.slug}" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-4 py-2 rounded-lg transition-all duration-300 text-sm font-semibold">
+                Ver más
+              </a>
+            </div>
           </div>
         </div>
       `).join('');
+
+      grid.classList.remove('hidden');
+    })
+    .catch(() => {
+      loading.classList.add('hidden');
+      error.classList.remove('hidden');
     });
 </script>

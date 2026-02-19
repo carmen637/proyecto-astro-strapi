@@ -4,13 +4,22 @@ import Button from '../components/Button.astro';
 
 const responseDestacados = await fetch('http://18.201.196.247:1337/api/libros?filters[destacado][$eq]=true&populate=portada');
 const dataDestacados = await responseDestacados.json();
-const librosDestacados = dataDestacados.data;
+const librosDestacados = dataDestacados.data ?? [];
 
 const responseTodos = await fetch('http://18.201.196.247:1337/api/libros?populate=portada');
 const dataTodos = await responseTodos.json();
-const todosLibros = dataTodos.data;
+const todosLibros = dataTodos.data ?? [];
 
-const tradicionesUnicas = [...new Set(todosLibros.map(libro => libro.tradicion))];
+const responseBlog = await fetch('http://18.201.196.247:1337/api/articulos?populate=imagen_destacada&sort=createdAt:desc&pagination[limit]=3');
+const dataBlog = await responseBlog.json();
+const articulos = dataBlog.data ?? [];
+
+const responseTradiciones = await fetch('http://18.201.196.247:1337/api/tradicions?populate=imagen');
+const dataTradiciones = await responseTradiciones.json();
+const tradiciones = dataTradiciones.data ?? [];
+
+console.log('tradiciones:', tradiciones);
+console.log('libros data', dataTodos);
 ---
 
 <Layout>
@@ -74,14 +83,151 @@ const tradicionesUnicas = [...new Set(todosLibros.map(libro => libro.tradicion))
     </p>
 
     <div class="grid gap-6" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-      {tradicionesUnicas.map(tradicion => (
-        <a href={`/libros?tradicion=${encodeURIComponent(tradicion)}`}>
-          <div class="bg-[#111827] p-8 rounded-xl border border-white/10 hover:border-[#D4AF37] transition duration-300 cursor-pointer">
-            <h3 class="text-xl font-semibold text-white">{tradicion}</h3>
+  {tradiciones.map(tradicion => (
+    <a href={`/libros?tradicion=${encodeURIComponent(tradicion.nombre)}`}>
+      <div 
+        class="relative h-48 rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition duration-300 cursor-pointer"
+        style={`background-image: url('http://18.201.196.247:1337${tradicion.imagen?.url}'); background-size: cover; background-position: center;`}
+      >
+        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <h3 class="text-xl font-semibold text-white text-center">{tradicion.nombre}</h3>
+        </div>
+      </div>
+    </a>
+  ))}
+</div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="py-24 bg-[#050814] text-white">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-serif mb-4">
+      Recibe <span class="text-[#FACC15]">sabiduría ancestral</span> cada semana
+    </h2>
+    <p class="text-gray-400 mb-10">
+      Únete a nuestra comunidad y recibe artículos, recomendaciones y rituales directamente en tu correo.
+    </p>
+
+    <form id="newsletter-form" class="flex flex-col sm:flex-row gap-4 justify-center">
+      <input 
+        type="email" 
+        id="newsletter-email"
+        placeholder="tu@email.com"
+        class="flex-1 px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+      />
+      <button 
+        type="submit"
+        class="px-8 py-3 bg-[#FACC15] text-black font-bold rounded-lg hover:bg-[#D4AF37] transition"
+      >
+        Suscribirme
+      </button>
+    </form>
+
+    <p id="newsletter-msg" class="mt-4 text-sm hidden"></p>
+  </div>
+</section>
+
+<!-- POR QUÉ ARCANA -->
+<section class="py-24 bg-[#0B0F2A] text-white">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-serif mb-4">
+      ¿Por qué <span class="text-[#FACC15]">Arcana</span>?
+    </h2>
+    <p class="text-gray-400 mb-16">
+      Más que una librería, un portal hacia el conocimiento prohibido
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#FACC15]/10 flex items-center justify-center border border-[#FACC15]/30">
+          <span class="text-3xl">✦</span>
+        </div>
+        <h3 class="text-xl font-semibold">Curaduría esotérica</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          Cada título de nuestra colección ha sido seleccionado por expertos en tradiciones místicas y sabiduría antigua.
+        </p>
+      </div>
+
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#FACC15]/10 flex items-center justify-center border border-[#FACC15]/30">
+          <span class="text-3xl">☽</span>
+        </div>
+        <h3 class="text-xl font-semibold">Envío seguro</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          Tus libros llegan protegidos y con el cuidado que merecen. Envíos nacionales e internacionales con seguimiento en tiempo real.
+        </p>
+      </div>
+
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-[#FACC15]/10 flex items-center justify-center border border-[#FACC15]/30">
+          <span class="text-3xl">⊕</span>
+        </div>
+        <h3 class="text-xl font-semibold">Expertos en ocultismo</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          Nuestro equipo lleva décadas estudiando el esoterismo. Estamos aquí para guiarte en tu camino iniciático.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section class="py-24 bg-gradient-to-b from-[#050814] to-[#0B0F2A] text-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <h2 class="text-4xl font-serif text-center mb-4">
+      Del <span class="text-[#FACC15]">Grimorio</span>
+    </h2>
+    <p class="text-gray-400 text-center mb-16">
+      Artículos, rituales y conocimiento esotérico para tu camino
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {articulos.map(articulo => (
+        <a href={`/blog/${articulo.slug}`} class="group">
+          <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 group-hover:border-[#D4AF37] transition-all duration-300 h-full flex flex-col">
+            {articulo.imagen_destacada?.url && (
+              <img
+                src={`http://18.201.196.247:1337${articulo.imagen_destacada.url}`}
+                alt={articulo.titulo}
+                class="w-full h-48 object-cover"
+              />
+            )}
+            <div class="p-6 flex flex-col flex-1">
+              <h3 class="text-xl font-bold text-white mb-3 group-hover:text-[#FACC15] transition">
+                {articulo.titulo}
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed line-clamp-3 flex-1">
+                {articulo.extracto}
+              </p>
+              <span class="mt-6 text-[#FACC15] text-sm font-semibold">
+                Leer artículo →
+              </span>
+            </div>
           </div>
         </a>
       ))}
     </div>
+
+    <div class="text-center mt-12">
+      <a href="/blog" class="border border-[#FACC15] text-[#FACC15] px-8 py-3 rounded-lg hover:bg-[#FACC15] hover:text-black transition font-semibold">
+        Ver todos los artículos
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FRASE MÍSTICA -->
+<section class="py-24 bg-[#050814] text-white text-center">
+  <div class="max-w-3xl mx-auto px-6">
+    <span class="text-[#FACC15] text-4xl">✦</span>
+    <blockquote class="mt-6 text-2xl md:text-3xl font-serif italic text-gray-200 leading-relaxed">
+      "El iniciado no busca la luz. Aprende a ver en la oscuridad."
+    </blockquote>
+    <p class="mt-6 text-gray-500 text-sm tracking-widest uppercase">— El Kybalión</p>
   </div>
 </section>
 
