@@ -1,0 +1,147 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
+    <div class="max-w-2xl mx-auto px-6">
+
+      <h1 class="text-center mb-4 text-white">
+        Contacta con <span class="text-[#FACC15]">Arcana</span>
+      </h1>
+      <p class="text-gray-400 text-center mb-16">
+        ¿Tienes alguna pregunta sobre nuestros libros o tradiciones?
+      </p>
+
+      <form id="contacto-form" class="space-y-6">
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Nombre</label>
+          <input 
+            type="text" 
+            id="nombre"
+            placeholder="Tu nombre"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-nombre" class="text-red-400 text-xs mt-1 hidden">El nombre debe tener al menos 2 caracteres.</p>
+        </div>
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Email</label>
+          <input 
+            type="text" 
+            id="email"
+            placeholder="tu@email.com"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-email" class="text-red-400 text-xs mt-1 hidden">Introduce un email válido.</p>
+        </div>
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Asunto</label>
+          <input 
+            type="text" 
+            id="asunto"
+            placeholder="¿En qué podemos ayudarte?"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-asunto" class="text-red-400 text-xs mt-1 hidden">El asunto debe tener al menos 5 caracteres.</p>
+        </div>
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Mensaje</label>
+          <textarea 
+            id="mensaje"
+            rows="5"
+            placeholder="Escribe tu mensaje aquí..."
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition resize-none"
+          ></textarea>
+          <p id="error-mensaje" class="text-red-400 text-xs mt-1 hidden">El mensaje debe tener al menos 20 caracteres.</p>
+        </div>
+
+        <button 
+          type="submit"
+          class="w-full py-3 bg-[#FACC15] text-black font-bold rounded-lg hover:bg-[#D4AF37] transition"
+        >
+          Enviar mensaje
+        </button>
+
+        <p id="form-success" class="text-green-400 text-center text-sm hidden">
+          ✦ Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.
+        </p>
+
+      </form>
+
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const form = document.getElementById('contacto-form');
+
+  const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,}$/;
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexAsunto = /^.{5,}$/;
+  const regexMensaje = /^.{20,}$/;
+
+  function validarCampo(id, regex, errorId) {
+    const valor = document.getElementById(id).value.trim();
+    const error = document.getElementById(errorId);
+    const input = document.getElementById(id);
+
+    if (!regex.test(valor)) {
+      error.classList.remove('hidden');
+      input.classList.add('border-red-500');
+      input.classList.remove('border-white/10');
+      return false;
+    } else {
+      error.classList.add('hidden');
+      input.classList.remove('border-red-500');
+      input.classList.add('border-white/10');
+      return true;
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const nombreValido = validarCampo('nombre', regexNombre, 'error-nombre');
+    const emailValido = validarCampo('email', regexEmail, 'error-email');
+    const asuntoValido = validarCampo('asunto', regexAsunto, 'error-asunto');
+    const mensajeValido = validarCampo('mensaje', regexMensaje, 'error-mensaje');
+
+    if (nombreValido && emailValido && asuntoValido && mensajeValido) {
+      try {
+        const boton = form.querySelector('button[type="submit"]');
+        boton.textContent = 'Enviando...';
+        boton.disabled = true;
+
+        const response = await fetch('http://18.201.196.247:1337/api/mensajes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            data: {
+              nombre: document.getElementById('nombre').value.trim(),
+              email: document.getElementById('email').value.trim(),
+              asunto: document.getElementById('asunto').value.trim(),
+              mensaje: document.getElementById('mensaje').value.trim()
+            }
+          })
+        });
+
+        if (response.ok) {
+          document.getElementById('form-success').classList.remove('hidden');
+          form.reset();
+        } else {
+          throw new Error('Error al enviar');
+        }
+      } catch (error) {
+        alert('Ha ocurrido un error. Inténtalo de nuevo.');
+      } finally {
+        const boton = form.querySelector('button[type="submit"]');
+        boton.textContent = 'Enviar mensaje';
+        boton.disabled = false;
+      }
+    }
+  });
+</script>

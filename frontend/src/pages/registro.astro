@@ -1,0 +1,135 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24 flex items-center">
+    <div class="max-w-md w-full mx-auto px-6">
+
+      <h1 class="text-center mb-4 text-white">
+        Crear <span class="text-[#FACC15]">Cuenta</span>
+      </h1>
+      <p class="text-gray-400 text-center mb-12">
+        Únete a la comunidad de Biblioteca Arcana
+      </p>
+
+      <form id="registro-form" class="space-y-6">
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Nombre de usuario</label>
+          <input 
+            type="text" 
+            id="username"
+            placeholder="Tu nombre de usuario"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-username" class="text-red-400 text-xs mt-1 hidden">El usuario debe tener al menos 3 caracteres.</p>
+        </div>
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Email</label>
+          <input 
+            type="text" 
+            id="email"
+            placeholder="tu@email.com"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-email" class="text-red-400 text-xs mt-1 hidden">Introduce un email válido.</p>
+        </div>
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Contraseña</label>
+          <input 
+            type="password" 
+            id="password"
+            placeholder="Mínimo 6 caracteres"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-password" class="text-red-400 text-xs mt-1 hidden">La contraseña debe tener al menos 6 caracteres.</p>
+        </div>
+
+        <button 
+          type="submit"
+          id="btn-submit"
+          class="w-full py-3 bg-[#FACC15] text-black font-bold rounded-lg hover:bg-[#D4AF37] transition"
+        >
+          Crear cuenta
+        </button>
+
+        <p id="error-registro" class="text-red-400 text-center text-sm hidden">
+          Error al crear la cuenta. El email o usuario ya existe.
+        </p>
+
+        <p class="text-center text-gray-500 text-sm">
+          ¿Ya tienes cuenta? 
+          <a href="/login" class="text-[#FACC15] hover:underline">Inicia sesión</a>
+        </p>
+
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const form = document.getElementById('registro-form');
+  const regexUsername = /^[a-zA-Z0-9]{3,}$/;
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexPassword = /^.{6,}$/;
+
+  function validarCampo(id, regex, errorId) {
+    const valor = document.getElementById(id).value.trim();
+    const error = document.getElementById(errorId);
+    const input = document.getElementById(id);
+    if (!regex.test(valor)) {
+      error.classList.remove('hidden');
+      input.classList.add('border-red-500');
+      return false;
+    } else {
+      error.classList.add('hidden');
+      input.classList.remove('border-red-500');
+      return true;
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const usernameValido = validarCampo('username', regexUsername, 'error-username');
+    const emailValido = validarCampo('email', regexEmail, 'error-email');
+    const passwordValido = validarCampo('password', regexPassword, 'error-password');
+
+    if (!usernameValido || !emailValido || !passwordValido) return;
+
+    const boton = document.getElementById('btn-submit');
+    boton.textContent = 'Creando cuenta...';
+    boton.disabled = true;
+
+    try {
+      const response = await fetch('http://18.201.196.247:1337/api/auth/local/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.jwt);
+        localStorage.setItem('usuario', JSON.stringify(data.user));
+        window.location.href = '/cuenta';
+      } else {
+        document.getElementById('error-registro').classList.remove('hidden');
+      }
+    } catch (error) {
+      document.getElementById('error-registro').classList.remove('hidden');
+    } finally {
+      boton.textContent = 'Crear cuenta';
+      boton.disabled = false;
+    }
+  });
+</script>

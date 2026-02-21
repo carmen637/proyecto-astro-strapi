@@ -1,0 +1,64 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+
+const { slug } = Astro.params;
+
+const response = await fetch(`http://18.201.196.247:1337/api/articulos?filters[slug][$eq]=${slug}&populate[0]=imagen_destacada`);
+const data = await response.json();
+const articulo = data.data?.[0];
+
+if (!articulo) {
+  return Astro.redirect('/blog');
+}
+
+const palabras = articulo.contenido?.split(' ').length ?? 0;
+const tiempoLectura = Math.ceil(palabras / 200);
+---
+
+<Layout>
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
+    <div class="max-w-3xl mx-auto px-6">
+
+      <nav class="text-sm text-gray-500 mb-12">
+        <a href="/" class="hover:text-[#FACC15] transition">Inicio</a>
+        <span class="mx-2">›</span>
+        <a href="/blog" class="hover:text-[#FACC15] transition">Blog</a>
+        <span class="mx-2">›</span>
+        <span class="text-gray-300">{articulo.titulo}</span>
+      </nav>
+
+      {articulo.imagen_destacada?.url && (
+        <img
+          src={`http://18.201.196.247:1337${articulo.imagen_destacada.url}`}
+          alt={articulo.titulo}
+          class="w-full h-72 object-cover rounded-xl mb-12 border border-white/10"
+        />
+      )}
+
+      <h1 class="text-white mb-4">{articulo.titulo}</h1>
+
+      <div class="flex items-center gap-6 text-sm text-gray-500 mb-12">
+        <span>✦ {tiempoLectura} min de lectura</span>
+        <span>{new Date(articulo.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      </div>
+
+      {articulo.extracto && (
+        <p class="text-gray-300 text-lg leading-relaxed border-l-2 border-[#FACC15] pl-6 mb-12 italic">
+          {articulo.extracto}
+        </p>
+      )}
+
+      <div class="text-gray-300 leading-relaxed space-y-6">
+        {articulo.contenido}
+      </div>
+
+      <div class="mt-16 pt-8 border-t border-white/10">
+        <a href="/blog" class="text-[#FACC15] hover:text-white transition text-sm font-semibold">
+          ← Volver al Grimorio
+        </a>
+      </div>
+
+    </div>
+  </section>
+</Layout>

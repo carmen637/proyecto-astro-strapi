@@ -1,0 +1,95 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+
+const { slug } = Astro.params;
+
+const response = await fetch(`http://18.201.196.247:1337/api/libros?filters[slug][$eq]=${slug}&populate[0]=portada&populate[1]=tradicion_rel`);
+const data = await response.json();
+console.log('data:', JSON.stringify(data));
+const libro = data.data?.[0];
+
+if (!libro) {
+  return Astro.redirect('/libros');
+}
+---
+
+<Layout>
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
+    <div class="max-w-5xl mx-auto px-6">
+
+      <!-- Breadcrumb -->
+      <nav class="text-sm text-gray-500 mb-12">
+        <a href="/" class="hover:text-[#FACC15] transition">Inicio</a>
+        <span class="mx-2">›</span>
+        <a href="/libros" class="hover:text-[#FACC15] transition">Catálogo</a>
+        <span class="mx-2">›</span>
+        <span class="text-gray-300">{libro.titulo}</span>
+      </nav>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+
+        <!-- Imagen -->
+        <div class="md:sticky md:top-24">
+  {libro.portada?.url 
+    ? <img 
+        src={`http://18.201.196.247:1337${libro.portada.url}`} 
+        alt={libro.titulo}
+        class="w-full max-w-sm mx-auto md:max-w-full rounded-xl border border-white/10 shadow-2xl"
+      />
+    : <div class="w-full aspect-[3/4] bg-[#111827] rounded-xl border border-white/10 flex items-center justify-center text-6xl">✦</div>
+  }
+</div>
+
+        <!-- Info -->
+        <div class="text-white">
+          {libro.tradicion_rel?.nombre && (
+            <span class="text-[#FACC15] text-sm uppercase tracking-widest mb-4 block">
+              {libro.tradicion_rel.nombre}
+            </span>
+          )}
+
+          <h1 class="text-white mb-3">{libro.titulo}</h1>
+          <p class="text-gray-400 text-lg mb-8">por <span class="text-gray-200">{libro.autor}</span></p>
+
+          <!-- Valoración -->
+          <div class="flex items-center gap-2 mb-8">
+            <span class="text-[#FACC15] text-xl">{'★'.repeat(Math.round(libro.valoracion))}{'☆'.repeat(5 - Math.round(libro.valoracion))}</span>
+            <span class="text-gray-400 text-sm">{libro.valoracion}/5</span>
+          </div>
+
+          <p class="text-gray-300 leading-relaxed mb-10">{libro.sinopsis}</p>
+
+          <!-- Detalles -->
+          <div class="grid grid-cols-2 gap-4 mb-10 text-sm">
+            <div class="bg-[#111827] rounded-lg p-4 border border-white/10">
+              <p class="text-gray-500 mb-1">Editorial</p>
+              <p class="text-gray-200">{libro.editorial}</p>
+            </div>
+            <div class="bg-[#111827] rounded-lg p-4 border border-white/10">
+              <p class="text-gray-500 mb-1">Páginas</p>
+              <p class="text-gray-200">{libro.paginas}</p>
+            </div>
+            <div class="bg-[#111827] rounded-lg p-4 border border-white/10">
+              <p class="text-gray-500 mb-1">Nivel</p>
+              <p class="text-gray-200">{libro.nivel}</p>
+            </div>
+            <div class="bg-[#111827] rounded-lg p-4 border border-white/10">
+              <p class="text-gray-500 mb-1">Idioma</p>
+              <p class="text-gray-200">{libro.idioma}</p>
+            </div>
+          </div>
+
+          <!-- Precio y CTA -->
+          <div class="flex items-center justify-between mt-6">
+            <span class="text-4xl font-bold text-[#FACC15]">{libro.precio}€</span>
+            <a href="/contacto" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-8 py-3 rounded-lg transition-all duration-300 font-semibold">
+              Solicitar
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</Layout>

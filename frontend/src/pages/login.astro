@@ -1,0 +1,121 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24 flex items-center">
+    <div class="max-w-md w-full mx-auto px-6">
+
+      <h1 class="text-center mb-4 text-white">
+        Iniciar <span class="text-[#FACC15]">Sesión</span>
+      </h1>
+      <p class="text-gray-400 text-center mb-12">
+        Accede a tu cuenta de Biblioteca Arcana
+      </p>
+
+      <form id="login-form" class="space-y-6">
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Email</label>
+          <input 
+            type="text" 
+            id="email"
+            placeholder="tu@email.com"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-email" class="text-red-400 text-xs mt-1 hidden">Introduce un email válido.</p>
+        </div>
+
+        <div>
+          <label class="text-gray-300 text-sm mb-2 block">Contraseña</label>
+          <input 
+            type="password" 
+            id="password"
+            placeholder="Tu contraseña"
+            class="w-full px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+          />
+          <p id="error-password" class="text-red-400 text-xs mt-1 hidden">La contraseña debe tener al menos 6 caracteres.</p>
+        </div>
+
+        <button 
+          type="submit"
+          id="btn-submit"
+          class="w-full py-3 bg-[#FACC15] text-black font-bold rounded-lg hover:bg-[#D4AF37] transition"
+        >
+          Entrar
+        </button>
+
+        <p id="error-login" class="text-red-400 text-center text-sm hidden">
+          Email o contraseña incorrectos.
+        </p>
+
+        <p class="text-center text-gray-500 text-sm">
+          ¿No tienes cuenta? 
+          <a href="/registro" class="text-[#FACC15] hover:underline">Regístrate aquí</a>
+        </p>
+
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const form = document.getElementById('login-form');
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexPassword = /^.{6,}$/;
+
+  function validarCampo(id, regex, errorId) {
+    const valor = document.getElementById(id).value.trim();
+    const error = document.getElementById(errorId);
+    const input = document.getElementById(id);
+    if (!regex.test(valor)) {
+      error.classList.remove('hidden');
+      input.classList.add('border-red-500');
+      return false;
+    } else {
+      error.classList.add('hidden');
+      input.classList.remove('border-red-500');
+      return true;
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const emailValido = validarCampo('email', regexEmail, 'error-email');
+    const passwordValido = validarCampo('password', regexPassword, 'error-password');
+
+    if (!emailValido || !passwordValido) return;
+
+    const boton = document.getElementById('btn-submit');
+    boton.textContent = 'Entrando...';
+    boton.disabled = true;
+
+    try {
+      const response = await fetch('http://18.201.196.247:1337/api/auth/local', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identifier: document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.jwt);
+        localStorage.setItem('usuario', JSON.stringify(data.user));
+        window.location.href = '/cuenta';
+      } else {
+        document.getElementById('error-login').classList.remove('hidden');
+      }
+    } catch (error) {
+      document.getElementById('error-login').classList.remove('hidden');
+    } finally {
+      boton.textContent = 'Entrar';
+      boton.disabled = false;
+    }
+  });
+</script>

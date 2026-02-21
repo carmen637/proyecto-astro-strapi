@@ -7,25 +7,81 @@ const global = data.data;
 <header class="sticky top-0 z-50 bg-[#0B0F2A] border-b border-white/10">
   <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
 
-    <!-- Logo / Nombre del sitio -->
+    <!-- Logo -->
     <h1 class="text-xl md:text-2xl font-serif tracking-wider text-white">
       {global.nombre_sitio}
     </h1>
 
-    <!-- Navegación -->
-    <nav class="hidden md:flex gap-10 text-sm tracking-wide">
+    <!-- Navegación desktop -->
+    <nav class="hidden md:flex gap-10 text-sm tracking-wide items-center">
       {global.nav_enlaces.map(enlace => (
-        <a 
-          href={enlace.url} 
-          class="relative group text-white transition duration-300"
-        >
-          <span class="group-hover:text-[#D4AF37] transition duration-300">
-            {enlace.texto}
-          </span>
+        <a href={enlace.url} class="relative group text-white transition duration-300">
+          <span class="group-hover:text-[#D4AF37] transition duration-300">{enlace.texto}</span>
           <span class="absolute left-0 -bottom-1 w-0 h-[1px] bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
         </a>
       ))}
+      <a id="btn-sesion" href="/login" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-4 py-1.5 rounded-lg transition text-sm font-semibold">
+        Iniciar sesión
+      </a>
     </nav>
 
+    <!-- Botón hamburguesa -->
+    <button id="menu-toggle" class="md:hidden text-white flex flex-col gap-1.5 p-2">
+      <span class="block w-6 h-0.5 bg-white transition-all duration-300" id="linea1"></span>
+      <span class="block w-6 h-0.5 bg-white transition-all duration-300" id="linea2"></span>
+      <span class="block w-6 h-0.5 bg-white transition-all duration-300" id="linea3"></span>
+    </button>
+
+  </div>
+
+  <!-- Menú móvil -->
+  <div id="menu-movil" class="hidden md:hidden bg-[#0B0F2A] border-t border-white/10 px-6 py-6 flex flex-col gap-6">
+    {global.nav_enlaces.map(enlace => (
+      <a href={enlace.url} class="text-white hover:text-[#FACC15] transition text-sm tracking-wide">
+        {enlace.texto}
+      </a>
+    ))}
+    <a id="btn-sesion-movil" href="/login" class="border border-[#FACC15] text-[#FACC15] text-center py-2 rounded-lg text-sm font-semibold">
+      Iniciar sesión
+    </a>
   </div>
 </header>
+
+<script>
+  // Sesión
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
+  
+  ['btn-sesion', 'btn-sesion-movil'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn && token && usuario) {
+      btn.textContent = usuario.username;
+      btn.href = '/cuenta';
+    }
+  });
+
+  // Hamburguesa
+  const toggle = document.getElementById('menu-toggle');
+  const menuMovil = document.getElementById('menu-movil');
+  const linea1 = document.getElementById('linea1');
+  const linea2 = document.getElementById('linea2');
+  const linea3 = document.getElementById('linea3');
+
+  let abierto = false;
+
+  toggle.addEventListener('click', () => {
+    abierto = !abierto;
+    menuMovil.classList.toggle('hidden');
+
+    // Animación a X
+    if (abierto) {
+      linea1.style.transform = 'rotate(45deg) translate(5px, 5px)';
+      linea2.style.opacity = '0';
+      linea3.style.transform = 'rotate(-45deg) translate(5px, -5px)';
+    } else {
+      linea1.style.transform = 'none';
+      linea2.style.opacity = '1';
+      linea3.style.transform = 'none';
+    }
+  });
+</script>
