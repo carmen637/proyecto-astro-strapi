@@ -1,5 +1,11 @@
 ---
-export const prerender = false;
+export async function getStaticPaths() {
+  const response = await fetch('http://18.201.196.247:1337/api/articulos');
+  const data = await response.json();
+  return data.data.map(articulo => ({
+    params: { slug: articulo.slug }
+  }));
+}
 import Layout from '../../layouts/Layout.astro';
 
 const { slug } = Astro.params;
