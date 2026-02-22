@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: http://arcanalibros.com/sitemap.xml

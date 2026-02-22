@@ -1,12 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const resTradiciones = await fetch('http://18.201.196.247:1337/api/tradicions');
+const dataTradiciones = await resTradiciones.json();
+const tradiciones = dataTradiciones.data ?? [];
 ---
 
 <Layout>
   <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
     <div class="max-w-6xl mx-auto px-6">
 
-      <!-- Cabecera -->
       <h1 class="text-center mb-4 text-white">
         Catálogo <span class="text-[#FACC15]">Esotérico</span>
       </h1>
@@ -14,66 +17,193 @@ import Layout from '../layouts/Layout.astro';
         Explora nuestra colección de sabiduría ancestral
       </p>
 
-      <!-- Loading state -->
+      <!-- Buscador, filtros y ordenación -->
+      <div class="flex flex-col md:flex-row gap-4 mb-12">
+        <input 
+          type="text" 
+          id="buscador"
+          placeholder="Buscar por título o autor..."
+          class="flex-1 px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+        />
+        <select id="filtro-tradicion" class="px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white focus:outline-none focus:border-[#D4AF37] transition">
+          <option value="">Todas las tradiciones</option>
+          {tradiciones.map(t => (
+            <option value={t.nombre}>{t.nombre}</option>
+          ))}
+        </select>
+        <select id="ordenacion" class="px-5 py-3 rounded-lg bg-[#111827] border border-white/10 text-white focus:outline-none focus:border-[#D4AF37] transition">
+          <option value="titulo-asc">Título A-Z</option>
+          <option value="titulo-desc">Título Z-A</option>
+          <option value="precio-asc">Precio menor</option>
+          <option value="precio-desc">Precio mayor</option>
+          <option value="valoracion-desc">Mejor valorados</option>
+        </select>
+      </div>
+
+      <!-- Resultados -->
+      <p id="resultados-count" class="text-gray-400 text-sm mb-8 hidden"></p>
+
+      <!-- Loading -->
       <div id="loading" class="text-center text-gray-400 py-20">
         <p class="text-xl">Invocando los libros...</p>
       </div>
 
       <!-- Grid -->
-      <div id="libros-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
+      <div id="libros-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
+
+      <!-- Sin resultados -->
+      <div id="sin-resultados" class="text-center text-gray-400 py-20 hidden">
+        <p class="text-xl">No se encontraron libros con ese criterio.</p>
       </div>
 
-      <!-- Error state -->
+      <!-- Error -->
       <div id="error" class="text-center text-red-400 py-20 hidden">
         <p>Error al cargar los libros. Inténtalo de nuevo.</p>
       </div>
+
+      <!-- Paginación -->
+      <div id="paginacion" class="flex justify-center gap-3 mt-12 hidden"></div>
 
     </div>
   </section>
 </Layout>
 
-
 <script>
   const grid = document.getElementById('libros-grid');
   const loading = document.getElementById('loading');
   const error = document.getElementById('error');
+  const sinResultados = document.getElementById('sin-resultados');
+  const resultadosCount = document.getElementById('resultados-count');
+  const paginacion = document.getElementById('paginacion');
 
-  fetch('http://18.201.196.247:1337/api/libros?populate=portada')
-    .then(res => res.json())
-    .then(data => {
-      const libros = data.data;
-      loading.classList.add('hidden');
+  const LIBROS_POR_PAGINA = 6;
+  let todosLosLibros = [];
+  let librosFiltrados = [];
+  let paginaActual = 1;
 
-      grid.innerHTML = libros.map(libro => `
-        <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition-all duration-300 flex flex-col">
-          ${libro.portada?.url 
-            ? `<img src="http://18.201.196.247:1337${libro.portada.url}" alt="${libro.titulo}" class="w-full h-48 object-cover"/>` 
-            : `<div class="w-full h-48 bg-[#0B0F2A] flex items-center justify-center text-4xl">✦</div>`
-          }
-          <div class="p-6 flex flex-col flex-1">
-            <h3 class="text-xl font-bold text-white mb-1">${libro.titulo}</h3>
-            <p class="text-gray-400 text-sm mb-3">por ${libro.autor}</p>
-            <p class="text-gray-300 text-sm mb-4 line-clamp-3">${libro.sinopsis}</p>
+  const regexBusqueda = (termino) => new RegExp(termino.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 
-            <div class="space-y-1 text-sm mb-6 mt-auto">
-              <p><span class="text-[#FACC15]">✦ Nivel:</span> <span class="text-gray-300">${libro.nivel}</span></p>
-              <p><span class="text-[#FACC15]">⭐ Valoración:</span> <span class="text-gray-300">${libro.valoracion}/5</span></p>
-            </div>
+  function normalizarTexto(texto) {
+    return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
 
-            <div class="flex justify-between items-center">
-              <span class="text-[#FACC15] font-bold text-xl">${libro.precio}€</span>
-              <a href="/libros/${libro.slug}" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-4 py-2 rounded-lg transition-all duration-300 text-sm font-semibold">
-                Ver más
-              </a>
-            </div>
+  function filtrarYOrdenar() {
+    const busqueda = document.getElementById('buscador').value.trim();
+    const tradicion = document.getElementById('filtro-tradicion').value;
+    const orden = document.getElementById('ordenacion').value;
+
+    let resultado = [...todosLosLibros];
+
+    // Filtrar por búsqueda con regex
+    if (busqueda) {
+      const regex = regexBusqueda(normalizarTexto(busqueda));
+      resultado = resultado.filter(libro => 
+        regex.test(normalizarTexto(libro.titulo)) || 
+        regex.test(normalizarTexto(libro.autor))
+      );
+    }
+
+    // Filtrar por tradición
+    if (tradicion) {
+      resultado = resultado.filter(libro => 
+        libro.tradicion_rel?.nombre === tradicion
+      );
+    }
+
+    // Ordenar
+    resultado.sort((a, b) => {
+      switch(orden) {
+        case 'titulo-asc': return a.titulo.localeCompare(b.titulo);
+        case 'titulo-desc': return b.titulo.localeCompare(a.titulo);
+        case 'precio-asc': return a.precio - b.precio;
+        case 'precio-desc': return b.precio - a.precio;
+        case 'valoracion-desc': return b.valoracion - a.valoracion;
+        default: return 0;
+      }
+    });
+
+    librosFiltrados = resultado;
+    paginaActual = 1;
+    renderizar();
+  }
+
+  function renderizar() {
+    const inicio = (paginaActual - 1) * LIBROS_POR_PAGINA;
+    const fin = inicio + LIBROS_POR_PAGINA;
+    const librosPagina = librosFiltrados.slice(inicio, fin);
+
+    resultadosCount.textContent = `${librosFiltrados.length} libro${librosFiltrados.length !== 1 ? 's' : ''} encontrado${librosFiltrados.length !== 1 ? 's' : ''}`;
+    resultadosCount.classList.remove('hidden');
+
+    if (librosFiltrados.length === 0) {
+      grid.classList.add('hidden');
+      sinResultados.classList.remove('hidden');
+      paginacion.classList.add('hidden');
+      return;
+    }
+
+    sinResultados.classList.add('hidden');
+    grid.classList.remove('hidden');
+
+    grid.innerHTML = librosPagina.map(libro => `
+      <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition-all duration-300 flex flex-col">
+        ${libro.portada?.url 
+          ? `<img src="http://18.201.196.247:1337${libro.portada.url}" alt="${libro.titulo}" class="w-full h-48 object-cover"/>` 
+          : `<div class="w-full h-48 bg-[#0B0F2A] flex items-center justify-center text-4xl">✦</div>`
+        }
+        <div class="p-6 flex flex-col flex-1">
+          <h3 class="text-xl font-bold text-white mb-1">${libro.titulo}</h3>
+          <p class="text-gray-400 text-sm mb-3">por ${libro.autor}</p>
+          <p class="text-gray-300 text-sm mb-4 line-clamp-3">${libro.sinopsis}</p>
+          <div class="space-y-1 text-sm mb-6 mt-auto">
+            <p><span class="text-[#FACC15]">✦ Nivel:</span> <span class="text-gray-300">${libro.nivel}</span></p>
+            <p><span class="text-[#FACC15]">⭐ Valoración:</span> <span class="text-gray-300">${libro.valoracion}/5</span></p>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-[#FACC15] font-bold text-xl">${libro.precio}€</span>
+            <a href="/libros/${libro.slug}" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-4 py-2 rounded-lg transition-all duration-300 text-sm font-semibold">
+              Ver más
+            </a>
           </div>
         </div>
-      `).join('');
+      </div>
+    `).join('');
 
-      grid.classList.remove('hidden');
+    // Paginación
+    const totalPaginas = Math.ceil(librosFiltrados.length / LIBROS_POR_PAGINA);
+    if (totalPaginas <= 1) {
+      paginacion.classList.add('hidden');
+    } else {
+      paginacion.classList.remove('hidden');
+      paginacion.innerHTML = Array.from({ length: totalPaginas }, (_, i) => i + 1).map(n => `
+        <button onclick="cambiarPagina(${n})" class="px-4 py-2 rounded-lg border transition-all duration-300 ${n === paginaActual ? 'bg-[#FACC15] text-black border-[#FACC15] font-bold' : 'border-white/10 text-gray-400 hover:border-[#FACC15] hover:text-[#FACC15]'}">
+          ${n}
+        </button>
+      `).join('');
+    }
+  }
+
+  window.cambiarPagina = (n) => {
+    paginaActual = n;
+    renderizar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Cargar libros
+  fetch('http://18.201.196.247:1337/api/libros?populate[0]=portada&populate[1]=tradicion_rel&pagination[limit]=100')
+    .then(res => res.json())
+    .then(data => {
+      todosLosLibros = data.data ?? [];
+      loading.classList.add('hidden');
+      filtrarYOrdenar();
     })
     .catch(() => {
       loading.classList.add('hidden');
       error.classList.remove('hidden');
     });
+
+  // Eventos
+  document.getElementById('buscador').addEventListener('input', filtrarYOrdenar);
+  document.getElementById('filtro-tradicion').addEventListener('change', filtrarYOrdenar);
+  document.getElementById('ordenacion').addEventListener('change', filtrarYOrdenar);
 </script>
