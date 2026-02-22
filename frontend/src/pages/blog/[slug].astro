@@ -22,7 +22,7 @@ const palabras = articulo.contenido?.split(' ').length ?? 0;
 const tiempoLectura = Math.ceil(palabras / 200);
 ---
 
-<Layout>
+<Layout title={articulo.seo?.meta_title || `${articulo.titulo} | Biblioteca Arcana`} description={articulo.seo?.meta_description || articulo.extracto}>
   <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
     <div class="max-w-3xl mx-auto px-6">
 

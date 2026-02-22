@@ -2,13 +2,29 @@
 import Header from '../components/header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = 'Biblioteca Arcana | Sabiduría esotérica y libros místicos',
+  description = 'Descubre nuestra colección de libros esotéricos sobre Cábala, Tarot, Astrología, Wicca y otras tradiciones místicas. Biblioteca Arcana, tu portal al conocimiento ancestral.'
+} = Astro.props;
 ---
 
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca Arcana</title>
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href={Astro.url} />
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
   <Header />
