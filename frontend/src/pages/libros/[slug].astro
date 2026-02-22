@@ -1,18 +1,18 @@
 ---
+import Layout from '../../layouts/Layout.astro';
+
 export async function getStaticPaths() {
-  const response = await fetch(`http://18.201.196.247:1337/api/libros?filters[slug][$eq]=${slug}&populate[0]=portada&populate[1]=tradicion_rel&populate[2]=seo`);
+  const response = await fetch('http://18.201.196.247:1337/api/libros');
   const data = await response.json();
   return data.data.map(libro => ({
     params: { slug: libro.slug }
   }));
 }
-import Layout from '../../layouts/Layout.astro';
 
 const { slug } = Astro.params;
 
-const response = await fetch(`http://18.201.196.247:1337/api/libros?filters[slug][$eq]=${slug}&populate[0]=portada&populate[1]=tradicion_rel`);
+const response = await fetch(`http://18.201.196.247:1337/api/libros?filters[slug][$eq]=${slug}&populate[0]=portada&populate[1]=tradicion_rel&populate[2]=seo`);
 const data = await response.json();
-console.log('data:', JSON.stringify(data));
 const libro = data.data?.[0];
 
 if (!libro) {
