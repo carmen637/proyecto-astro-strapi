@@ -71,6 +71,7 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
+  
   const grid = document.getElementById("libros-grid");
   const loading = document.getElementById("loading");
   const error = document.getElementById("error");
@@ -226,7 +227,16 @@ import Layout from "../layouts/Layout.astro";
         option.textContent = t.nombre;
         select.appendChild(option);
       });
+      const urlParams = new URLSearchParams(window.location.search);
+    const tradicionUrl = urlParams.get('tradicion');
+    if (tradicionUrl) {
+      select.value = tradicionUrl;
+      filtrarYOrdenar();
+    }
+  
     });
+
+    
 
   // Cargar libros
   fetch(
