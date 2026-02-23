@@ -71,3 +71,41 @@ span{
     @apply border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black;
   }
 }
+.prose h2 {
+  color: #FACC15;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.prose h3 {
+  color: #D4AF37;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose p {
+  color: #D1D5DB;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.prose ul, .prose ol {
+  color: #D1D5DB;
+  margin-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose strong {
+  color: #F3F4F6;
+}
+
+.prose blockquote {
+  border-left: 3px solid #FACC15;
+  padding-left: 1rem;
+  color: #9CA3AF;
+  font-style: italic;
+}
