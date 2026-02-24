@@ -103,18 +103,29 @@ if (!libro) {
       </div>
     </div>
   </section>
+  <div id="toast" class="fixed bottom-6 right-6 bg-[#0B0F2A] border border-[#FACC15]/30 text-white px-6 py-4 rounded-xl shadow-2xl z-50 hidden transition-all duration-300">
+  <p id="toast-mensaje" class="text-sm font-semibold"></p>
+</div>
 </Layout>
 <script>
-  window.añadirAlCarrito = (slug, titulo, autor, precio, portada) => {
-    const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
-    const existe = carrito.find(l => l.slug === slug);
-    if (existe) {
-      alert('Este libro ya está en tu carrito');
-      return;
-    }
-    carrito.push({ slug, titulo, autor, precio, portada });
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    window.dispatchEvent(new Event('carritoActualizado'));
-    alert(`"${titulo}" añadido al carrito`);
-  };
+  function mostrarToast(mensaje) {
+  const toast = document.getElementById('toast');
+  const toastMensaje = document.getElementById('toast-mensaje');
+  toastMensaje.textContent = mensaje;
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+window.añadirAlCarrito = (slug, titulo, autor, precio, portada, stock) => {
+  const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+  const existe = carrito.find(l => l.slug === slug);
+  if (existe) {
+    mostrarToast('Este libro ya está en tu carrito');
+    return;
+  }
+  carrito.push({ slug, titulo, autor, precio, portada, cantidad: 1, stock: parseInt(stock) });
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+  window.dispatchEvent(new Event('carritoActualizado'));
+  mostrarToast(`✦ "${titulo}" añadido al carrito`);
+};
 </script>

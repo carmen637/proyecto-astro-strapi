@@ -39,6 +39,9 @@ import Layout from '../layouts/Layout.astro';
 
     </div>
   </section>
+  <div id="toast" class="fixed bottom-6 right-6 bg-[#0B0F2A] border border-[#FACC15]/30 text-white px-6 py-4 rounded-xl shadow-2xl z-50 hidden transition-all duration-300">
+  <p id="toast-mensaje" class="text-sm font-semibold"></p>
+</div>
 </Layout>
 
 <script>
@@ -79,12 +82,20 @@ import Layout from '../layouts/Layout.astro';
     total.textContent = `${totalPrecio.toFixed(2)}€`;
   }
 
+  function mostrarToast(mensaje) {
+  const toast = document.getElementById('toast');
+  const toastMensaje = document.getElementById('toast-mensaje');
+  toastMensaje.textContent = mensaje;
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
   window.cambiarCantidad = (index, cambio) => {
   const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
   const nuevaCantidad = (carrito[index].cantidad || 1) + cambio;
   if (nuevaCantidad < 1) return;
-  if (nuevaCantidad > carrito[index].stock) {
-    alert(`Solo hay ${carrito[index].stock} unidades disponibles`);
+  if (carrito[index].stock && nuevaCantidad > carrito[index].stock) {
+    mostrarToast(`Solo hay ${carrito[index].stock} unidades disponibles`);
     return;
   }
   carrito[index].cantidad = nuevaCantidad;
