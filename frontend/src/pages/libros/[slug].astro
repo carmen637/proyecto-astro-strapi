@@ -87,15 +87,34 @@ if (!libro) {
           </div>
 
           <!-- Precio y CTA -->
-          <div class="flex items-center justify-between mt-6">
-            <span class="text-4xl font-bold text-[#FACC15]">{libro.precio}€</span>
-            <a href="/contacto" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-8 py-3 rounded-lg transition-all duration-300 font-semibold">
-              Solicitar
-            </a>
-          </div>
+<div class="mt-6">
+  <span class="text-4xl font-bold text-[#FACC15]">{libro.precio}€</span>
+  <div class="flex gap-4 mt-6">
+    <button 
+      onclick={`añadirAlCarrito('${libro.slug}', '${libro.titulo}', '${libro.autor}', '${libro.precio}', 'http://18.201.196.247:1337${libro.portada?.url || ''}')`}
+      class="flex-1 border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-6 py-3 rounded-lg transition font-semibold"
+    >
+      + Añadir al carrito
+    </button>
+  </div>
+</div>
         </div>
 
       </div>
     </div>
   </section>
 </Layout>
+<script>
+  window.añadirAlCarrito = (slug, titulo, autor, precio, portada) => {
+    const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+    const existe = carrito.find(l => l.slug === slug);
+    if (existe) {
+      alert('Este libro ya está en tu carrito');
+      return;
+    }
+    carrito.push({ slug, titulo, autor, precio, portada });
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    window.dispatchEvent(new Event('carritoActualizado'));
+    alert(`"${titulo}" añadido al carrito`);
+  };
+</script>

@@ -1,0 +1,111 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Carrito | Biblioteca Arcana" description="Tu selección de libros esotéricos.">
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
+    <div class="max-w-4xl mx-auto px-6">
+
+      <h1 class="text-white mb-4 text-center">
+        Tu <span class="text-[#FACC15]">Carrito</span>
+      </h1>
+      <p class="text-gray-400 text-center mb-16">Libros seleccionados para tu viaje esotérico</p>
+
+      <div id="carrito-vacio" class="text-center py-20 hidden">
+        <p class="text-gray-400 text-xl mb-6">Tu carrito está vacío</p>
+        <a href="/libros" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-6 py-3 rounded-lg transition font-semibold">
+          Explorar catálogo
+        </a>
+      </div>
+
+      <div id="carrito-contenido" class="hidden">
+        <div id="carrito-lista" class="space-y-4 mb-12"></div>
+
+        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div>
+            <p class="text-gray-400 text-sm">Total</p>
+            <p id="carrito-total" class="text-[#FACC15] text-3xl font-bold">0€</p>
+          </div>
+          <div class="flex gap-4">
+            <button id="vaciar-carrito" class="border border-white/20 text-gray-400 hover:border-red-400 hover:text-red-400 px-6 py-3 rounded-lg transition font-semibold text-sm">
+              Vaciar carrito
+            </button>
+            <button class="bg-[#FACC15] text-black font-bold px-8 py-3 rounded-lg hover:bg-[#D4AF37] transition">
+              Finalizar compra
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</Layout>
+
+<script>
+  function renderCarrito() {
+    const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+    const vacio = document.getElementById('carrito-vacio');
+    const contenido = document.getElementById('carrito-contenido');
+    const lista = document.getElementById('carrito-lista');
+    const total = document.getElementById('carrito-total');
+
+    if (carrito.length === 0) {
+      vacio.classList.remove('hidden');
+      contenido.classList.add('hidden');
+      return;
+    }
+
+    vacio.classList.add('hidden');
+    contenido.classList.remove('hidden');
+
+    lista.innerHTML = carrito.map((libro, index) => `
+  <div class="bg-[#111827] rounded-xl border border-white/10 p-6 flex gap-6 items-center">
+    <img src="${libro.portada}" alt="${libro.titulo}" class="w-16 h-24 object-cover rounded-lg border border-white/10 flex-shrink-0"/>
+    <div class="flex-1">
+      <h3 class="text-white font-bold text-lg">${libro.titulo}</h3>
+      <p class="text-gray-400 text-sm">por ${libro.autor}</p>
+      <p class="text-[#FACC15] font-bold mt-2">${(libro.precio * (libro.cantidad || 1)).toFixed(2)}€</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="cambiarCantidad(${index}, -1)" class="w-8 h-8 border border-white/20 text-white hover:border-[#FACC15] hover:text-[#FACC15] rounded-lg transition flex items-center justify-center">−</button>
+      <span class="text-white font-bold w-6 text-center">${libro.cantidad || 1}</span>
+      <button onclick="cambiarCantidad(${index}, 1)" class="w-8 h-8 border border-white/20 text-white hover:border-[#FACC15] hover:text-[#FACC15] rounded-lg transition flex items-center justify-center">+</button>
+    </div>
+    <button onclick="eliminarDelCarrito(${index})" class="text-gray-500 hover:text-red-400 transition text-xl ml-4">✕</button>
+  </div>
+`).join('');
+
+    const totalPrecio = carrito.reduce((sum, libro) => sum + (parseFloat(libro.precio) * (libro.cantidad || 1)), 0);
+    total.textContent = `${totalPrecio.toFixed(2)}€`;
+  }
+
+  window.cambiarCantidad = (index, cambio) => {
+  const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+  const nuevaCantidad = (carrito[index].cantidad || 1) + cambio;
+  if (nuevaCantidad < 1) return;
+  if (nuevaCantidad > carrito[index].stock) {
+    alert(`Solo hay ${carrito[index].stock} unidades disponibles`);
+    return;
+  }
+  carrito[index].cantidad = nuevaCantidad;
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+  window.dispatchEvent(new Event('carritoActualizado'));
+  renderCarrito();
+};
+
+  window.eliminarDelCarrito = (index) => {
+    const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+    carrito.splice(index, 1);
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    window.dispatchEvent(new Event('carritoActualizado'));
+    renderCarrito();
+  };
+
+  document.getElementById('vaciar-carrito').addEventListener('click', () => {
+    localStorage.removeItem('carrito');
+    window.dispatchEvent(new Event('carritoActualizado'));
+    renderCarrito();
+  });
+
+  renderCarrito();
+</script>

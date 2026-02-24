@@ -178,6 +178,9 @@ import Layout from "../layouts/Layout.astro";
           </div>
           <div class="flex justify-between items-center">
             <span class="text-[#FACC15] font-bold text-xl">${libro.precio}€</span>
+            <button onclick="añadirAlCarrito('${libro.slug}', '${libro.titulo}', '${libro.autor}', '${libro.precio}', 'http://18.201.196.247:1337${libro.portada?.url || ''}', '${libro.stock}')" class="border border-white/20 text-gray-400 hover:border-[#FACC15] hover:text-[#FACC15] px-4 py-2 rounded-lg transition-all duration-300 text-sm">
+              + Carrito
+            </button>
             <a href="/libros/${libro.slug}" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-4 py-2 rounded-lg transition-all duration-300 text-sm font-semibold">
               Ver más
             </a>
@@ -263,4 +266,17 @@ import Layout from "../layouts/Layout.astro";
   document
     .getElementById("ordenacion")
     .addEventListener("change", filtrarYOrdenar);
+
+    window.añadirAlCarrito = (slug, titulo, autor, precio, portada, stock) => {
+  const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+  const existe = carrito.find(l => l.slug === slug);
+  if (existe) {
+    alert('Este libro ya está en tu carrito');
+    return;
+  }
+  carrito.push({ slug, titulo, autor, precio, portada, cantidad: 1, stock: parseInt(stock) });
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+  window.dispatchEvent(new Event('carritoActualizado'));
+  alert(`"${titulo}" añadido al carrito`);
+};
 </script>

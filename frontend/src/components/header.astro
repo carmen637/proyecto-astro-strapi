@@ -20,6 +20,10 @@ const global = data.data;
           <span class="absolute left-0 -bottom-1 w-0 h-[1px] bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
         </a>
       ))}
+      <a href="/carrito" class="relative text-white hover:text-[#FACC15] transition">
+  <span class="text-xl">🛒</span>
+  <span id="carrito-count" class="absolute -top-2 -right-2 bg-[#FACC15] text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+</a>
       <a id="btn-sesion" href="/login" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-4 py-1.5 rounded-lg transition text-sm font-semibold">
         Iniciar sesión
       </a>
@@ -41,6 +45,10 @@ const global = data.data;
         {enlace.texto}
       </a>
     ))}
+    <a href="/carrito" class="relative text-white hover:text-[#FACC15] transition text-sm tracking-wide flex items-center gap-2">
+  🛒 Carrito
+  <span id="carrito-count-movil" class="bg-[#FACC15] text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+</a>
     <a id="btn-sesion-movil" href="/login" class="border border-[#FACC15] text-[#FACC15] text-center py-2 rounded-lg text-sm font-semibold">
       Iniciar sesión
     </a>
@@ -84,4 +92,21 @@ const global = data.data;
       linea3.style.transform = 'none';
     }
   });
+  // Actualizar contador carrito
+function actualizarContadorCarrito() {
+  const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+  ['carrito-count', 'carrito-count-movil'].forEach(id => {
+    const count = document.getElementById(id);
+    if (count) {
+      if (carrito.length > 0) {
+        count.textContent = carrito.length;
+        count.classList.remove('hidden');
+      } else {
+        count.classList.add('hidden');
+      }
+    }
+  });
+}
+actualizarContadorCarrito();
+window.addEventListener('carritoActualizado', actualizarContadorCarrito);
 </script>
