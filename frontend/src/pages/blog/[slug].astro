@@ -30,21 +30,23 @@ if (!articulo) {
   return Astro.redirect('/blog');
 }
 
-const palabras = articulo.contenido?.split(' ').length ?? 0;
+const { titulo, extracto, contenido, createdAt } = articulo;
+
+const palabras = contenido?.split(' ').length ?? 0;
 const tiempoLectura = Math.ceil(palabras / 200);
 
 import { marked } from 'marked';
-const contenidoHTML = marked(articulo.contenido);
+const contenidoHTML = marked(contenido);
 ---
 
-<Layout title={articulo.seo?.meta_title || `${articulo.titulo} | Biblioteca Arcana`} description={articulo.seo?.meta_description || articulo.extracto}>
+<Layout title={articulo.seo?.meta_title || `${titulo} | Biblioteca Arcana`} description={articulo.seo?.meta_description || extracto}>
   <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814]">
     
     {articulo.imagen_destacada?.url && (
       <div class="w-full h-80 overflow-hidden">
         <img
           src={`http://18.201.196.247:1337${articulo.imagen_destacada.url}`}
-          alt={articulo.titulo}
+          alt={titulo}
           class="w-full h-full object-cover"
         />
       </div>
@@ -57,19 +59,19 @@ const contenidoHTML = marked(articulo.contenido);
         <span class="mx-2">›</span>
         <a href="/blog" class="hover:text-[#FACC15] transition">Blog</a>
         <span class="mx-2">›</span>
-        <span class="text-gray-300">{articulo.titulo}</span>
+        <span class="text-gray-300">{titulo}</span>
       </nav>
 
-      <h1 class="text-white mb-4 text-4xl md:text-5xl">{articulo.titulo}</h1>
+      <h1 class="text-white mb-4 text-4xl md:text-5xl">{titulo}</h1>
 
       <div class="flex items-center gap-6 text-sm text-gray-500 mb-12">
         <span>✦ {tiempoLectura} min de lectura</span>
-        <span>{new Date(articulo.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+        <span>{new Date(createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
       </div>
 
-      {articulo.extracto && (
+      {extracto && (
         <p class="text-gray-300 text-lg leading-relaxed border-l-2 border-[#FACC15] pl-6 mb-12 italic">
-          {articulo.extracto}
+          {extracto}
         </p>
       )}
 
