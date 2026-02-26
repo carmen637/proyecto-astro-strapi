@@ -1,0 +1,302 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Finalizar Compra | Biblioteca Arcana" description="Completa tu pedido de forma segura.">
+  <section class="min-h-screen bg-gradient-to-b from-[#0B0F2A] to-[#050814] py-24">
+    <div class="max-w-2xl mx-auto px-6">
+
+      <h1 class="text-white text-center mb-4">
+        Finalizar <span class="text-[#FACC15]">Compra</span>
+      </h1>
+
+      <!-- Indicador de pasos -->
+      <div class="flex items-center justify-center gap-4 mb-16">
+        <div class="flex items-center gap-2">
+          <div id="step-1-indicator" class="w-8 h-8 rounded-full bg-[#FACC15] text-black font-bold flex items-center justify-center text-sm">1</div>
+          <span id="step-1-label" class="text-[#FACC15] text-sm font-semibold">Datos</span>
+        </div>
+        <div class="w-16 h-px bg-white/20"></div>
+        <div class="flex items-center gap-2">
+          <div id="step-2-indicator" class="w-8 h-8 rounded-full bg-white/10 text-gray-400 font-bold flex items-center justify-center text-sm">2</div>
+          <span id="step-2-label" class="text-gray-400 text-sm">Pago</span>
+        </div>
+        <div class="w-16 h-px bg-white/20"></div>
+        <div class="flex items-center gap-2">
+          <div id="step-3-indicator" class="w-8 h-8 rounded-full bg-white/10 text-gray-400 font-bold flex items-center justify-center text-sm">3</div>
+          <span id="step-3-label" class="text-gray-400 text-sm">Confirmación</span>
+        </div>
+      </div>
+
+      <!-- PASO 1: Datos personales y dirección -->
+      <div id="paso-1">
+        <h2 class="text-white text-2xl font-serif mb-8 text-center">Datos de envío</h2>
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">Nombre</label>
+              <input type="text" id="nombre" placeholder="Carmen" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+              <p id="error-nombre" class="text-red-400 text-xs mt-1 hidden">Introduce tu nombre</p>
+            </div>
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">Apellidos</label>
+              <input type="text" id="apellidos" placeholder="García" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+              <p id="error-apellidos" class="text-red-400 text-xs mt-1 hidden">Introduce tus apellidos</p>
+            </div>
+          </div>
+          <div>
+            <label class="text-gray-400 text-sm mb-2 block">Email</label>
+            <input type="email" id="email" placeholder="tu@email.com" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+            <p id="error-email" class="text-red-400 text-xs mt-1 hidden">Introduce un email válido</p>
+          </div>
+          <div>
+            <label class="text-gray-400 text-sm mb-2 block">Teléfono</label>
+            <input type="text" id="telefono" placeholder="612345678" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+            <p id="error-telefono" class="text-red-400 text-xs mt-1 hidden">Introduce un teléfono válido (9 dígitos)</p>
+          </div>
+          <div>
+            <label class="text-gray-400 text-sm mb-2 block">Dirección</label>
+            <input type="text" id="direccion" placeholder="Calle Mayor 123, 2ºA" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+            <p id="error-direccion" class="text-red-400 text-xs mt-1 hidden">Introduce tu dirección</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">Ciudad</label>
+              <input type="text" id="ciudad" placeholder="Madrid" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+              <p id="error-ciudad" class="text-red-400 text-xs mt-1 hidden">Introduce tu ciudad</p>
+            </div>
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">Código Postal</label>
+              <input type="text" id="cp" placeholder="28001" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+              <p id="error-cp" class="text-red-400 text-xs mt-1 hidden">Código postal inválido (5 dígitos)</p>
+            </div>
+          </div>
+        </div>
+        <button id="btn-paso-2" class="w-full mt-8 bg-[#FACC15] text-black font-bold px-8 py-3 rounded-lg hover:bg-[#D4AF37] transition">
+          Continuar al pago →
+        </button>
+      </div>
+
+      <!-- PASO 2: Datos de pago -->
+      <div id="paso-2" class="hidden">
+        <h2 class="text-white text-2xl font-serif mb-8 text-center">Datos de pago</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="text-gray-400 text-sm mb-2 block">Nombre en la tarjeta</label>
+            <input type="text" id="nombre-tarjeta" placeholder="CARMEN GARCIA" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition uppercase"/>
+            <p id="error-nombre-tarjeta" class="text-red-400 text-xs mt-1 hidden">Introduce el nombre de la tarjeta</p>
+          </div>
+          <div>
+            <label class="text-gray-400 text-sm mb-2 block">Número de tarjeta</label>
+            <input type="text" id="numero-tarjeta" placeholder="1234 5678 9012 3456" maxlength="19" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition font-mono"/>
+            <p id="error-numero-tarjeta" class="text-red-400 text-xs mt-1 hidden">Número de tarjeta inválido (16 dígitos)</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">Fecha de caducidad</label>
+              <input type="text" id="caducidad" placeholder="MM/AA" maxlength="5" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+              <p id="error-caducidad" class="text-red-400 text-xs mt-1 hidden">Formato inválido (MM/AA)</p>
+            </div>
+            <div>
+              <label class="text-gray-400 text-sm mb-2 block">CVV</label>
+              <input type="text" id="cvv" placeholder="123" maxlength="3" class="w-full px-4 py-3 rounded-lg bg-[#111827] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"/>
+              <p id="error-cvv" class="text-red-400 text-xs mt-1 hidden">CVV inválido (3 dígitos)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen del pedido -->
+        <div class="mt-8 bg-[#111827] rounded-xl border border-white/10 p-6">
+          <h3 class="text-white font-semibold mb-4">Resumen del pedido</h3>
+          <div id="resumen-items" class="space-y-2 mb-4"></div>
+          <div class="border-t border-white/10 pt-4 flex justify-between">
+            <span class="text-gray-400">Total</span>
+            <span id="resumen-total" class="text-[#FACC15] font-bold text-xl"></span>
+          </div>
+        </div>
+
+        <div class="flex gap-4 mt-8">
+          <button id="btn-volver-1" class="flex-1 border border-white/20 text-gray-400 hover:border-white hover:text-white px-8 py-3 rounded-lg transition font-semibold">
+            ← Volver
+          </button>
+          <button id="btn-paso-3" class="flex-1 bg-[#FACC15] text-black font-bold px-8 py-3 rounded-lg hover:bg-[#D4AF37] transition">
+            Confirmar pedido
+          </button>
+        </div>
+      </div>
+
+      <!-- PASO 3: Confirmación -->
+      <div id="paso-3" class="hidden text-center py-12">
+        <div class="text-[#FACC15] text-6xl mb-6">✦</div>
+        <h2 class="text-white text-3xl font-serif mb-4">¡Pedido confirmado!</h2>
+        <p class="text-gray-400 mb-4">Gracias por tu compra. Recibirás un email de confirmación en breve.</p>
+        <p id="confirmacion-email" class="text-[#FACC15] font-semibold mb-12"></p>
+        <a href="/libros" class="border border-[#FACC15] text-[#FACC15] hover:bg-[#FACC15] hover:text-black px-8 py-3 rounded-lg transition font-semibold">
+          Seguir explorando
+        </a>
+      </div>
+
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Cargar resumen del carrito
+  const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+
+  // Regex de validaciones
+  const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const regexTelefono = /^[6-9]\d{8}$/;
+  const regexCP = /^\d{5}$/;
+  const regexTarjeta = /^\d{16}$/;
+  const regexCaducidad = /^(0[1-9]|1[0-2])\/\d{2}$/;
+  const regexCVV = /^\d{3}$/;
+
+  // Formatear número de tarjeta con espacios
+  document.getElementById('numero-tarjeta').addEventListener('input', (e) => {
+    let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+    e.target.value = val.replace(/(.{4})/g, '$1 ').trim();
+  });
+
+  // Formatear caducidad con /
+  document.getElementById('caducidad').addEventListener('input', (e) => {
+    let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+    if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2);
+    e.target.value = val;
+  });
+
+  function mostrarError(id, mostrar) {
+    document.getElementById(id).classList.toggle('hidden', !mostrar);
+  }
+
+  function validarPaso1() {
+    const nombre = document.getElementById('nombre').value.trim();
+    const apellidos = document.getElementById('apellidos').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const direccion = document.getElementById('direccion').value.trim();
+    const ciudad = document.getElementById('ciudad').value.trim();
+    const cp = document.getElementById('cp').value.trim();
+
+    let valido = true;
+
+    mostrarError('error-nombre', !nombre);
+    mostrarError('error-apellidos', !apellidos);
+    mostrarError('error-email', !regexEmail.test(email));
+    mostrarError('error-telefono', !regexTelefono.test(telefono));
+    mostrarError('error-direccion', !direccion);
+    mostrarError('error-ciudad', !ciudad);
+    mostrarError('error-cp', !regexCP.test(cp));
+
+    if (!nombre || !apellidos || !regexEmail.test(email) || !regexTelefono.test(telefono) || !direccion || !ciudad || !regexCP.test(cp)) {
+      valido = false;
+    }
+
+    return valido;
+  }
+
+  function validarPaso2() {
+    const nombreTarjeta = document.getElementById('nombre-tarjeta').value.trim();
+    const numeroTarjeta = document.getElementById('numero-tarjeta').value.replace(/\s/g, '');
+    const caducidad = document.getElementById('caducidad').value.trim();
+    const cvv = document.getElementById('cvv').value.trim();
+
+    mostrarError('error-nombre-tarjeta', !nombreTarjeta);
+    mostrarError('error-numero-tarjeta', !regexTarjeta.test(numeroTarjeta));
+    mostrarError('error-caducidad', !regexCaducidad.test(caducidad));
+    mostrarError('error-cvv', !regexCVV.test(cvv));
+
+    return nombreTarjeta && regexTarjeta.test(numeroTarjeta) && regexCaducidad.test(caducidad) && regexCVV.test(cvv);
+  }
+
+  function activarStep(step) {
+    [1, 2, 3].forEach(n => {
+      const indicator = document.getElementById(`step-${n}-indicator`);
+      const label = document.getElementById(`step-${n}-label`);
+      if (n === step) {
+        indicator.classList.remove('bg-white/10', 'text-gray-400');
+        indicator.classList.add('bg-[#FACC15]', 'text-black');
+        label.classList.remove('text-gray-400');
+        label.classList.add('text-[#FACC15]', 'font-semibold');
+      } else if (n < step) {
+        indicator.classList.remove('bg-white/10', 'text-gray-400');
+        indicator.classList.add('bg-[#FACC15]/30', 'text-[#FACC15]');
+      }
+    });
+  }
+
+  // Botón paso 1 → 2
+  document.getElementById('btn-paso-2').addEventListener('click', () => {
+    if (!validarPaso1()) return;
+
+    // Cargar resumen
+    const resumenItems = document.getElementById('resumen-items');
+    const total = carrito.reduce((sum, l) => sum + (parseFloat(l.precio) * (l.cantidad || 1)), 0);
+    resumenItems.innerHTML = carrito.map(l => `
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-300">${l.titulo} x${l.cantidad || 1}</span>
+        <span class="text-white">${(parseFloat(l.precio) * (l.cantidad || 1)).toFixed(2)}€</span>
+      </div>
+    `).join('');
+    document.getElementById('resumen-total').textContent = `${total.toFixed(2)}€`;
+
+    document.getElementById('paso-1').classList.add('hidden');
+    document.getElementById('paso-2').classList.remove('hidden');
+    activarStep(2);
+  });
+
+  // Botón volver
+  document.getElementById('btn-volver-1').addEventListener('click', () => {
+    document.getElementById('paso-2').classList.add('hidden');
+    document.getElementById('paso-1').classList.remove('hidden');
+    activarStep(1);
+  });
+
+  // Botón paso 2 → 3
+  document.getElementById('btn-paso-3').addEventListener('click', () => {
+    if (!validarPaso2()) return;
+
+    const email = document.getElementById('email').value.trim();
+    document.getElementById('confirmacion-email').textContent = email;
+
+    // Vaciar carrito
+    localStorage.removeItem('carrito');
+    sessionStorage.removeItem('pago-datos');
+    window.dispatchEvent(new Event('carritoActualizado'));
+
+    document.getElementById('paso-2').classList.add('hidden');
+    document.getElementById('paso-3').classList.remove('hidden');
+    activarStep(3);
+  });
+
+  // Guardar datos paso 1 en sessionStorage
+function guardarDatosPaso1() {
+  sessionStorage.setItem('pago-datos', JSON.stringify({
+    nombre: document.getElementById('nombre').value,
+    apellidos: document.getElementById('apellidos').value,
+    email: document.getElementById('email').value,
+    telefono: document.getElementById('telefono').value,
+    direccion: document.getElementById('direccion').value,
+    ciudad: document.getElementById('ciudad').value,
+    cp: document.getElementById('cp').value,
+  }));
+}
+
+// Recuperar datos al cargar la página
+function recuperarDatosPaso1() {
+  const datos = JSON.parse(sessionStorage.getItem('pago-datos') || '{}');
+  if (datos.nombre) document.getElementById('nombre').value = datos.nombre;
+  if (datos.apellidos) document.getElementById('apellidos').value = datos.apellidos;
+  if (datos.email) document.getElementById('email').value = datos.email;
+  if (datos.telefono) document.getElementById('telefono').value = datos.telefono;
+  if (datos.direccion) document.getElementById('direccion').value = datos.direccion;
+  if (datos.ciudad) document.getElementById('ciudad').value = datos.ciudad;
+  if (datos.cp) document.getElementById('cp').value = datos.cp;
+}
+
+recuperarDatosPaso1();
+
+['nombre', 'apellidos', 'email', 'telefono', 'direccion', 'ciudad', 'cp'].forEach(id => {
+  document.getElementById(id).addEventListener('input', guardarDatosPaso1);
+});
+</script>
