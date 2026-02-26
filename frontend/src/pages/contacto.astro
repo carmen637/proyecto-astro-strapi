@@ -70,6 +70,10 @@ import Layout from '../layouts/Layout.astro';
           ✦ Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.
         </p>
 
+        <p id="form-error" class="text-red-400 text-center text-sm hidden">
+  ✦ Ha ocurrido un error. Inténtalo de nuevo.
+</p>
+
       </form>
 
     </div>
@@ -136,7 +140,7 @@ import Layout from '../layouts/Layout.astro';
           throw new Error('Error al enviar');
         }
       } catch (error) {
-        alert('Ha ocurrido un error. Inténtalo de nuevo.');
+        document.getElementById('form-error').classList.remove('hidden');
       } finally {
         const boton = form.querySelector('button[type="submit"]');
         boton.textContent = 'Enviar mensaje';

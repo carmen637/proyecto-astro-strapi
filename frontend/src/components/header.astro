@@ -1,7 +1,15 @@
 ---
-const response = await fetch('http://18.201.196.247:1337/api/global?populate=nav_enlaces');
-const data = await response.json();
-const global = data.data;
+
+let global = { nombre_sitio: 'Biblioteca Arcana', nav_enlaces: [] };
+
+try {
+  const response = await fetch('http://18.201.196.247:1337/api/global?populate=nav_enlaces');
+  const data = await response.json();
+  global = data.data;
+} catch (error) {
+  console.error('Error al cargar el header:', error);
+}
+
 ---
 
 <header class="sticky top-0 z-50 bg-[#0B0F2A] border-b border-white/10">

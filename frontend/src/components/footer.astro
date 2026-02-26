@@ -46,36 +46,30 @@
 <script>
   // Footer texto
   fetch('http://18.201.196.247:1337/api/global')
-    .then(res => res.json())
-    .then(data => {
-      const el = document.getElementById('footer-text');
-      if (el && data.data?.footer_texto) {
-        el.textContent = data.data.footer_texto;
-      }
-    });
+  .then(res => res.json())
+  .then(data => {
+    const el = document.getElementById('footer-text');
+    if (el && data.data?.footer_texto) {
+      el.textContent = data.data.footer_texto;
+    }
+  })
+  .catch(() => console.error('Error al cargar el footer'));
 
-  // Tradiciones
-  fetch('http://18.201.196.247:1337/api/tradicions')
-    .then(res => res.json())
-    .then(data => {
-      const lista = document.getElementById('footer-tradiciones');
-      if (lista && data.data?.length) {
-        lista.innerHTML = data.data.map(t => `
-          <li>
-            <a href="/libros?tradicion=${encodeURIComponent(t.nombre)}" 
-               class="text-gray-300 hover:text-[#FACC15] transition text-sm">
-              ${t.nombre}
-            </a>
-          </li>
-        `).join('');
-      }
-    });
+fetch('http://18.201.196.247:1337/api/tradicions')
+  .then(res => res.json())
+  .then(data => {
+    const lista = document.getElementById('footer-tradiciones');
+    if (lista && data.data?.length) {
+      lista.innerHTML = data.data.map(t => `
+        <li>
+          <a href="/libros?tradicion=${encodeURIComponent(t.nombre)}" 
+             class="text-gray-300 hover:text-[#FACC15] transition text-sm">
+            ${t.nombre}
+          </a>
+        </li>
+      `).join('');
+    }
+  })
+  .catch(() => console.error('Error al cargar las tradiciones'));
 </script>
 
-<script>
-  fetch('http://18.201.196.247:1337/api/global')
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('footer-text').textContent = data.data.footer_texto;
-    });
-</script>

@@ -165,7 +165,7 @@ import Layout from "../layouts/Layout.astro";
     grid.innerHTML = librosPagina
       .map(
         (libro) => `
-      <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition-all duration-300 flex flex-col">
+      <div class="card overflow-hidden flex flex-col">
         ${
           libro.portada?.url
             ? `<img src="http://18.201.196.247:1337${libro.portada.url}" alt="${libro.titulo}" class="w-full h-48 object-cover"/>`
@@ -240,8 +240,10 @@ import Layout from "../layouts/Layout.astro";
       filtrarYOrdenar();
     }
   
-    });
-
+    })
+    .catch(() => {
+    console.error('Error al cargar las tradiciones');
+  });
     
 
   // Cargar libros

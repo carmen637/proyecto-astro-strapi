@@ -2,18 +2,29 @@
 import Layout from '../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
-  const response = await fetch('http://18.201.196.247:1337/api/libros');
-  const data = await response.json();
-  return data.data.map(libro => ({
-    params: { slug: libro.slug }
-  }));
+  try {
+    const response = await fetch('http://18.201.196.247:1337/api/libros');
+    const data = await response.json();
+    return data.data.map(libro => ({
+      params: { slug: libro.slug }
+    }));
+  } catch (error) {
+    console.error('Error en getStaticPaths:', error);
+    return [];
+  }
 }
 
 const { slug } = Astro.params;
 
-const response = await fetch(`http://18.201.196.247:1337/api/libros?filters[slug][$eq]=${slug}&populate[0]=portada&populate[1]=tradicion_rel&populate[2]=seo`);
-const data = await response.json();
-const libro = data.data?.[0];
+let libro = null;
+
+try {
+  const response = await fetch(`http://18.201.196.247:1337/api/libros?filters[slug][$eq]=${slug}&populate[0]=portada&populate[1]=tradicion_rel&populate[2]=seo`);
+  const data = await response.json();
+  libro = data.data?.[0];
+} catch (error) {
+  console.error('Error al cargar el libro:', error);
+}
 
 if (!libro) {
   return Astro.redirect('/libros');

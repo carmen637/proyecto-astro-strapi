@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: http://arcanalibros.com/sitemap.xml
+Sitemap: http://arcanalibros.com/sitemap-index.xml

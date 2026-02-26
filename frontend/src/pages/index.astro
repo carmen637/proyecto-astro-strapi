@@ -2,22 +2,31 @@
 import Layout from '../layouts/Layout.astro';
 import Button from '../components/Button.astro';
 
-const responseDestacados = await fetch('http://18.201.196.247:1337/api/libros?filters[destacado][$eq]=true&populate=portada');
-const dataDestacados = await responseDestacados.json();
-const librosDestacados = dataDestacados.data ?? [];
+let librosDestacados = [];
+let todosLibros = [];
+let articulos = [];
+let tradiciones = [];
 
-const responseTodos = await fetch('http://18.201.196.247:1337/api/libros?populate=portada');
-const dataTodos = await responseTodos.json();
-const todosLibros = dataTodos.data ?? [];
+try {
+  const responseDestacados = await fetch('http://18.201.196.247:1337/api/libros?filters[destacado][$eq]=true&populate=portada');
+  const dataDestacados = await responseDestacados.json();
+  librosDestacados = dataDestacados.data ?? [];
 
-const responseBlog = await fetch('http://18.201.196.247:1337/api/articulos?populate=imagen_destacada&sort=createdAt:desc&pagination[limit]=3');
-const dataBlog = await responseBlog.json();
-const articulos = dataBlog.data ?? [];
+  const responseTodos = await fetch('http://18.201.196.247:1337/api/libros?populate=portada');
+  const dataTodos = await responseTodos.json();
+  todosLibros = dataTodos.data ?? [];
 
-const responseTradiciones = await fetch('http://18.201.196.247:1337/api/tradicions?populate=imagen');
-const dataTradiciones = await responseTradiciones.json();
-const tradiciones = dataTradiciones.data ?? [];
+  const responseBlog = await fetch('http://18.201.196.247:1337/api/articulos?populate=imagen_destacada&sort=createdAt:desc&pagination[limit]=3');
+  const dataBlog = await responseBlog.json();
+  articulos = dataBlog.data ?? [];
 
+  const responseTradiciones = await fetch('http://18.201.196.247:1337/api/tradicions?populate=imagen');
+  const dataTradiciones = await responseTradiciones.json();
+  tradiciones = dataTradiciones.data ?? [];
+
+} catch (error) {
+  console.error('Error al cargar datos desde Strapi:', error);
+}
 ---
 
 <Layout>
@@ -37,7 +46,7 @@ const tradiciones = dataTradiciones.data ?? [];
 <!-- NOVEDADES -->
 <section class="py-24 bg-gradient-to-b from-[#0B0F2A] to-[#050814]">
   <div class="max-w-6xl mx-auto px-6">
-    <h2 class="text-4xl font-serif text-center mb-4 text-white">
+    <h2 class="text-center mb-4 text-white">
       Nuevos en <span class="text-[#FACC15]">Arcana</span>
     </h2>
     <p class="text-gray-400 text-center mb-16">
@@ -46,7 +55,7 @@ const tradiciones = dataTradiciones.data ?? [];
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {librosDestacados.slice(0, 3).map(libro => (
-        <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition-all duration-300">
+        <div class="card overflow-hidden">
           {libro.portada?.url && (
             <img 
               src={`http://18.201.196.247:1337${libro.portada.url}`} 
@@ -75,39 +84,37 @@ const tradiciones = dataTradiciones.data ?? [];
 <!-- TRADICIONES -->
 <section class="py-24 bg-[#0B0F2A] text-white">
   <div class="max-w-6xl mx-auto px-6 text-center">
-    <h2 class="text-4xl font-serif mb-4">Tradiciones Esotéricas</h2>
+    <h2 class="mb-4">Tradiciones Esotéricas</h2>
     <p class="text-gray-400 mb-16">
       Explora los diferentes caminos del conocimiento místico
     </p>
 
     <div class="grid gap-6" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-  {tradiciones.map(tradicion => (
-    <a href={`/libros?tradicion=${encodeURIComponent(tradicion.nombre)}`}>
-  <div class="relative h-48 rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition duration-300 cursor-pointer">
-    {tradicion.imagen?.url && (
-      <img 
-        src={`http://18.201.196.247:1337${tradicion.imagen.url}`}
-        alt={`Tradición ${tradicion.nombre}`}
-        class="w-full h-full object-cover"
-      />
-    )}
-    <div class="absolute inset-0 bg-black/50"></div>
-    <div class="absolute inset-0 flex items-center justify-center">
-      <h3 class="text-xl font-semibold text-white text-center">{tradicion.nombre}</h3>
+      {tradiciones.map(tradicion => (
+        <a href={`/libros?tradicion=${encodeURIComponent(tradicion.nombre)}`}>
+          <div class="relative h-48 rounded-xl overflow-hidden border border-white/10 hover:border-[#D4AF37] transition duration-300 cursor-pointer">
+            {tradicion.imagen?.url && (
+              <img 
+                src={`http://18.201.196.247:1337${tradicion.imagen.url}`}
+                alt={`Tradición ${tradicion.nombre}`}
+                class="w-full h-full object-cover"
+              />
+            )}
+            <div class="absolute inset-0 bg-black/50"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <h3 class="text-xl font-semibold text-white text-center">{tradicion.nombre}</h3>
+            </div>
+          </div>
+        </a>
+      ))}
     </div>
   </div>
-</a>
-  ))}
-</div>
-  </div>
 </section>
-
-
 
 <!-- SIMULADOR DE TIRADA -->
 <section class="py-24 bg-[#050814] text-white">
   <div class="max-w-4xl mx-auto px-6 text-center">
-    <h2 class="text-4xl font-serif mb-4">
+    <h2 class="mb-4">
       Tirada del <span class="text-[#FACC15]">Oráculo</span>
     </h2>
     <p class="text-gray-400 mb-16">
@@ -179,8 +186,8 @@ const tradiciones = dataTradiciones.data ?? [];
       Nueva tirada
     </button>
     <button id="btn-oraculo" class="hidden ml-4 bg-[#FACC15] text-black font-bold px-8 py-3 rounded-lg hover:bg-[#D4AF37] transition">
-  Ver recomendación del oráculo
-</button>
+      Ver recomendación del oráculo
+    </button>
   </div>
 </section>
 
@@ -209,7 +216,7 @@ const tradiciones = dataTradiciones.data ?? [];
 <!-- NEWSLETTER -->
 <section class="py-24 bg-[#050814] text-white">
   <div class="max-w-2xl mx-auto px-6 text-center">
-    <h2 class="text-4xl font-serif mb-4">
+    <h2 class="mb-4">
       Recibe <span class="text-[#FACC15]">sabiduría ancestral</span> cada semana
     </h2>
     <p class="text-gray-400 mb-10">
@@ -238,7 +245,7 @@ const tradiciones = dataTradiciones.data ?? [];
 <!-- POR QUÉ ARCANA -->
 <section class="py-24 bg-[#0B0F2A] text-white">
   <div class="max-w-6xl mx-auto px-6 text-center">
-    <h2 class="text-4xl font-serif mb-4">
+    <h2 class="mb-4">
       ¿Por qué <span class="text-[#FACC15]">Arcana</span>?
     </h2>
     <p class="text-gray-400 mb-16">
@@ -284,7 +291,7 @@ const tradiciones = dataTradiciones.data ?? [];
 <!-- BLOG -->
 <section class="py-24 bg-gradient-to-b from-[#050814] to-[#0B0F2A] text-white">
   <div class="max-w-6xl mx-auto px-6">
-    <h2 class="text-4xl font-serif text-center mb-4">
+    <h2 class="text-center mb-4">
       Del <span class="text-[#FACC15]">Grimorio</span>
     </h2>
     <p class="text-gray-400 text-center mb-16">
@@ -294,7 +301,7 @@ const tradiciones = dataTradiciones.data ?? [];
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {articulos.map(articulo => (
         <a href={`/blog/${articulo.slug}`} class="group">
-          <div class="bg-[#111827] rounded-xl overflow-hidden border border-white/10 group-hover:border-[#D4AF37] transition-all duration-300 h-full flex flex-col">
+          <div class="card overflow-hidden h-full flex flex-col">
             {articulo.imagen_destacada?.url && (
               <img
                 src={`http://18.201.196.247:1337${articulo.imagen_destacada.url}`}
@@ -371,102 +378,123 @@ const tradiciones = dataTradiciones.data ?? [];
   draw();
 
   // SIMULADOR DE TIRADA
-(async () => {
-try {
-  let cartas = [];
-  let libros = [];
-  let reveladas = 0;
-  let cartasSeleccionadas = [];
+  (async () => {
+    try {
+      let cartas = [];
+      let libros = [];
+      let reveladas = 0;
+      let cartasSeleccionadas = [];
 
-  const [resCartas, resLibros] = await Promise.all([
-    fetch('http://18.201.196.247:1337/api/cartas?populate=imagen'),
-    fetch('http://18.201.196.247:1337/api/libros?populate=portada')
-  ]);
+      const [resCartas, resLibros] = await Promise.all([
+        fetch('http://18.201.196.247:1337/api/cartas?populate=imagen'),
+        fetch('http://18.201.196.247:1337/api/libros?populate=portada')
+      ]);
 
-  const dataCartas = await resCartas.json();
-  const dataLibros = await resLibros.json();
-  cartas = dataCartas.data ?? [];
-  libros = dataLibros.data ?? [];
+      const dataCartas = await resCartas.json();
+      const dataLibros = await resLibros.json();
+      cartas = dataCartas.data ?? [];
+      libros = dataLibros.data ?? [];
 
-  function mezclar(arr) {
-    return [...arr].sort(() => Math.random() - 0.5);
-  }
-
-  function nuevaTirada() {
-    cartasSeleccionadas = mezclar(cartas).slice(0, 3);
-    reveladas = 0;
-    document.getElementById('btn-oraculo').classList.add('hidden');
-
-    for (let i = 0; i < 3; i++) {
-      const carta = document.getElementById(`carta-${i}`);
-      const inner = carta.querySelector('.carta-inner');
-      inner.style.transform = '';
-      document.getElementById(`desc-${i}`).classList.add('hidden');
-
-      const c = cartasSeleccionadas[i];
-      document.getElementById(`img-${i}`).src = `http://18.201.196.247:1337${c.imagen?.url}`;
-      document.getElementById(`img-${i}`).alt = c.nombre;
-      document.getElementById(`nombre-${i}`).textContent = c.nombre;
-      document.getElementById(`desc-${i}`).textContent = c.descripcion;
-
-      if (i === 0) {
-        carta.classList.remove('opacity-50', 'cursor-not-allowed');
-        carta.classList.add('cursor-pointer');
-      } else {
-        carta.classList.add('opacity-50', 'cursor-not-allowed');
-        carta.classList.remove('cursor-pointer');
+      function mezclar(arr) {
+        return [...arr].sort(() => Math.random() - 0.5);
       }
+
+      function nuevaTirada() {
+        cartasSeleccionadas = mezclar(cartas).slice(0, 3);
+        reveladas = 0;
+        document.getElementById('btn-oraculo').classList.add('hidden');
+
+        for (let i = 0; i < 3; i++) {
+          const carta = document.getElementById(`carta-${i}`);
+          const inner = carta.querySelector('.carta-inner');
+          inner.style.transform = '';
+          document.getElementById(`desc-${i}`).classList.add('hidden');
+
+          const c = cartasSeleccionadas[i];
+          document.getElementById(`img-${i}`).src = `http://18.201.196.247:1337${c.imagen?.url}`;
+          document.getElementById(`img-${i}`).alt = c.nombre;
+          document.getElementById(`nombre-${i}`).textContent = c.nombre;
+          document.getElementById(`desc-${i}`).textContent = c.descripcion;
+
+          if (i === 0) {
+            carta.classList.remove('opacity-50', 'cursor-not-allowed');
+            carta.classList.add('cursor-pointer');
+          } else {
+            carta.classList.add('opacity-50', 'cursor-not-allowed');
+            carta.classList.remove('cursor-pointer');
+          }
+        }
+      }
+
+      nuevaTirada();
+
+      document.getElementById('btn-tirada').addEventListener('click', nuevaTirada);
+
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`carta-${i}`).addEventListener('click', () => {
+          if (reveladas !== i) return;
+          const carta = document.getElementById(`carta-${i}`);
+          if (carta.classList.contains('cursor-not-allowed')) return;
+
+          const inner = carta.querySelector('.carta-inner');
+          inner.style.transform = 'rotateY(180deg)';
+          document.getElementById(`desc-${i}`).classList.remove('hidden');
+          reveladas++;
+
+          if (reveladas < 3) {
+            const siguiente = document.getElementById(`carta-${reveladas}`);
+            siguiente.classList.remove('opacity-50', 'cursor-not-allowed');
+            siguiente.classList.add('cursor-pointer');
+          }
+
+          if (reveladas === 3) {
+            setTimeout(() => {
+              document.getElementById('btn-oraculo').classList.remove('hidden');
+            }, 800);
+          }
+        });
+      }
+
+      document.getElementById('btn-oraculo').addEventListener('click', () => {
+        const libroAleatorio = libros[Math.floor(Math.random() * libros.length)];
+        document.getElementById('popup-portada').src = `http://18.201.196.247:1337${libroAleatorio.portada?.url}`;
+        document.getElementById('popup-portada').alt = libroAleatorio.titulo;
+        document.getElementById('popup-titulo').textContent = libroAleatorio.titulo;
+        document.getElementById('popup-autor').textContent = `por ${libroAleatorio.autor}`;
+        document.getElementById('popup-link').href = `/libros/${libroAleatorio.slug}`;
+        document.getElementById('popup-libro').classList.remove('hidden');
+        document.getElementById('btn-oraculo').classList.add('hidden');
+      });
+
+      document.getElementById('cerrar-popup').addEventListener('click', () => {
+        document.getElementById('popup-libro').classList.add('hidden');
+      });
+    } catch(error) {
+      console.log('Error cargando el simulador:', error);
+      document.getElementById('btn-tirada').textContent = 'Error al cargar las cartas';
+      document.getElementById('btn-tirada').disabled = true;
     }
-  }
+  })();
 
-  nuevaTirada();
+  // NEWSLETTER
+  document.getElementById('newsletter-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('newsletter-email').value.trim();
+    const msg = document.getElementById('newsletter-msg');
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    if (!regexEmail.test(email)) {
+      msg.textContent = 'Por favor, introduce un email válido.';
+      msg.classList.remove('hidden', 'text-green-400');
+      msg.classList.add('text-red-400');
+      return;
+    }
 
-  document.getElementById('btn-tirada').addEventListener('click', nuevaTirada);
-
-  for (let i = 0; i < 3; i++) {
-    document.getElementById(`carta-${i}`).addEventListener('click', () => {
-      if (reveladas !== i) return;
-      const carta = document.getElementById(`carta-${i}`);
-      if (carta.classList.contains('cursor-not-allowed')) return;
-
-      const inner = carta.querySelector('.carta-inner');
-      inner.style.transform = 'rotateY(180deg)';
-      document.getElementById(`desc-${i}`).classList.remove('hidden');
-      reveladas++;
-
-      if (reveladas < 3) {
-        const siguiente = document.getElementById(`carta-${reveladas}`);
-        siguiente.classList.remove('opacity-50', 'cursor-not-allowed');
-        siguiente.classList.add('cursor-pointer');
-      }
-
-      if (reveladas === 3) {
-        setTimeout(() => {
-          document.getElementById('btn-oraculo').classList.remove('hidden');
-        }, 800);
-      }
-    });
-  }
-
-  document.getElementById('btn-oraculo').addEventListener('click', () => {
-    const libroAleatorio = libros[Math.floor(Math.random() * libros.length)];
-    document.getElementById('popup-portada').src = `http://18.201.196.247:1337${libroAleatorio.portada?.url}`;
-    document.getElementById('popup-portada').alt = libroAleatorio.titulo;
-    document.getElementById('popup-titulo').textContent = libroAleatorio.titulo;
-    document.getElementById('popup-autor').textContent = `por ${libroAleatorio.autor}`;
-    document.getElementById('popup-link').href = `/libros/${libroAleatorio.slug}`;
-    document.getElementById('popup-libro').classList.remove('hidden');
-    document.getElementById('btn-oraculo').classList.add('hidden');
+    msg.textContent = '✦ ¡Bienvenido a la comunidad arcana!';
+    msg.classList.remove('hidden', 'text-red-400');
+    msg.classList.add('text-green-400');
+    document.getElementById('newsletter-email').value = '';
   });
-
-  document.getElementById('cerrar-popup').addEventListener('click', () => {
-    document.getElementById('popup-libro').classList.add('hidden');
-  });
-} catch(error) {
-    console.log('Error cargando el simulador:', error);
-    document.getElementById('btn-tirada').textContent = 'Error al cargar las cartas';
-    document.getElementById('btn-tirada').disabled = true;
-}
-})();
 </script>
 </Layout>
