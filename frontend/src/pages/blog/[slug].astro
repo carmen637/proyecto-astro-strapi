@@ -1,7 +1,7 @@
 ---
 export async function getStaticPaths() {
   try {
-    const response = await fetch('http://18.201.196.247:1337/api/articulos');
+    const response = await fetch('http://176.34.154.250:1337/api/articulos');
     const data = await response.json();
     return data.data.map(articulo => ({
       params: { slug: articulo.slug }
@@ -19,7 +19,7 @@ const { slug } = Astro.params;
 let articulo = null;
 
 try {
-  const response = await fetch(`http://18.201.196.247:1337/api/articulos?filters[slug][$eq]=${slug}&populate[0]=imagen_destacada`);
+  const response = await fetch(`http://176.34.154.250:1337/api/articulos?filters[slug][$eq]=${slug}&populate[0]=imagen_destacada`);
   const data = await response.json();
   articulo = data.data?.[0];
 } catch (error) {
@@ -45,7 +45,7 @@ const contenidoHTML = marked(contenido);
     {articulo.imagen_destacada?.url && (
       <div class="w-full h-80 overflow-hidden">
         <img
-          src={`http://18.201.196.247:1337${articulo.imagen_destacada.url}`}
+          src={`http://176.34.154.250:1337${articulo.imagen_destacada.url}`}
           alt={titulo}
           class="w-full h-full object-cover"
         />

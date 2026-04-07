@@ -120,7 +120,7 @@ import Layout from '../layouts/Layout.astro';
         boton.textContent = 'Enviando...';
         boton.disabled = true;
 
-        const response = await fetch('http://18.201.196.247:1337/api/mensajes', {
+        const response = await fetch('http://176.34.154.250:1337/api/mensajes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
